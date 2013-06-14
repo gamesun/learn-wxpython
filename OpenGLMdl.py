@@ -1,12 +1,12 @@
+# -*- coding:utf-8 -*-
+
+
 import wx
 import sys
 
-# This working example of the use of OpenGL in the wxPython context
-# was assembled in August 2012 from the GLCanvas.py file found in
-# the wxPython docs-demo package, plus components of that package's
-# run-time environment.
-
-# Note that dragging the mouse rotates the view of the 3D cube or cone.
+""" 
+OpenGl module
+"""
 
 try:
     from wx import glcanvas
@@ -23,61 +23,9 @@ try:
 except ImportError:
     haveOpenGL = False
 
-#----------------------------------------------------------------------
 
-buttonDefs = {
-    wx.NewId() : ('CubeCanvas',      'Cube'),
-    wx.NewId() : ('ConeCanvas',      'Cone'),
-    }
+#---------------------------------------------------------------------------
 
-class ButtonPanel(wx.Panel):
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent, -1)
-
-        box = wx.BoxSizer(wx.HORIZONTAL)
-#        box = wx.BoxSizer(wx.VERTICAL)
-        box.Add((10,10))
-        keys = buttonDefs.keys()
-        keys.sort()
-        for k in keys:
-            text = buttonDefs[k][1]
-            btn = wx.Button(self, k, text)
-            box.Add(btn, 0, wx.ALIGN_CENTER|wx.ALL, 15)
-            self.Bind(wx.EVT_BUTTON, self.OnButton, btn)
-
-        # With this enabled, you see how you can put a GLCanvas on the wx.Panel
-        if 1:
-            c = CubeCanvas(self)
-            c.SetMinSize((200, 200))
-            box.Add(c, 0, wx.ALIGN_CENTER|wx.ALL, 15)
-
-        self.SetAutoLayout(True)
-        self.SetSizer(box)
-
-    def OnButton(self, evt):
-        if not haveGLCanvas:
-            dlg = wx.MessageDialog(self,
-                                   'The GLCanvas class has not been included with this build of wxPython!',
-                                   'Sorry', wx.OK | wx.ICON_WARNING)
-            dlg.ShowModal()
-            dlg.Destroy()
-
-        elif not haveOpenGL:
-            dlg = wx.MessageDialog(self,
-                                   'The OpenGL package was not found.  You can get it at\n'
-                                   'http://PyOpenGL.sourceforge.net/',
-                                   'Sorry', wx.OK | wx.ICON_WARNING)
-            dlg.ShowModal()
-            dlg.Destroy()
-
-        else:
-            canvasClassName = buttonDefs[evt.GetId()][0]
-            canvasClass = eval(canvasClassName)
-            cx = 0
-            if canvasClassName == 'ConeCanvas': cx = 400
-            frame = wx.Frame(None, -1, canvasClassName, size=(400,400), pos=(cx,400))
-            canvasClass(frame) # CubeCanvas(frame) or ConeCanvas(frame); frame passed to MyCanvasBase
-            frame.Show(True)
 
 class MyCanvasBase(glcanvas.GLCanvas):
     def __init__(self, parent):
@@ -248,51 +196,3 @@ class ConeCanvas(MyCanvasBase):
         # push into visible buffer
         self.SwapBuffers()
 
-
-#----------------------------------------------------------------------
-class RunDemoApp(wx.App):
-    def __init__(self):
-        wx.App.__init__(self, redirect=False)
-
-    def OnInit(self):
-        frame = wx.Frame(None, -1, "RunDemo: ", pos=(0,0),
-                        style=wx.DEFAULT_FRAME_STYLE, name="run a sample")
-        #frame.CreateStatusBar()
-
-        menuBar = wx.MenuBar()
-        menu = wx.Menu()
-        item = menu.Append(wx.ID_EXIT, "E&xit\tCtrl-Q", "Exit demo")
-        self.Bind(wx.EVT_MENU, self.OnExitApp, item)
-        menuBar.Append(menu, "&File")
-        
-        frame.SetMenuBar(menuBar)
-        frame.Show(True)
-        frame.Bind(wx.EVT_CLOSE, self.OnCloseFrame)
-
-        win = runTest(frame)
-
-        # set the frame to a good size for showing the two buttons
-        frame.SetSize((600,400))
-        win.SetFocus()
-        self.window = win
-        frect = frame.GetRect()
-
-        self.SetTopWindow(frame)
-        self.frame = frame
-        return True
-        
-    def OnExitApp(self, evt):
-        self.frame.Close(True)
-
-    def OnCloseFrame(self, evt):
-        if hasattr(self, "window") and hasattr(self.window, "ShutdownDemo"):
-            self.window.ShutdownDemo()
-        evt.Skip()
-
-def runTest(frame):
-    win = ButtonPanel(frame)
-    return win
-
-if __name__ == '__main__':
-    app = RunDemoApp()
-    app.MainLoop()

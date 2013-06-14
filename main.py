@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
-#import sys,os
+import sys,os
 import wx
+import OpenGLMdl as glmdl  
 
 """ 
 
@@ -29,6 +30,7 @@ class MyFrame(wx.Frame):
         menu.Append(wx.ID_CLOSE,   "&Close")
         menu.Append(wx.ID_SAVE,    "&Save")
         menu.Append(wx.ID_SAVEAS,  "Save &as...")
+        menu.Append(wx.ID_EXIT,    "&Exit", "Exit The Tool")
         menu.Enable(wx.ID_NEW, False)
         menu.Enable(wx.ID_CLOSE, False)
         menu.Enable(wx.ID_SAVE, False)
@@ -41,7 +43,10 @@ class MyFrame(wx.Frame):
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(menu)
 
+        
+        
         self.Bind(wx.EVT_MENU, self.OnFileOpenDialog, id=wx.ID_OPEN)
+        self.Bind(wx.EVT_MENU, self.OnExit, id=wx.ID_EXIT)
         self.Bind(
             wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9
             )
@@ -54,7 +59,7 @@ class MyFrame(wx.Frame):
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
         del self.filehistory
-        self.menu.Destroy()
+#        self.menu.Destroy()
 
     def OnFileOpenDialog(self, evt):
         dlg = wx.FileDialog(self,
@@ -80,7 +85,8 @@ class MyFrame(wx.Frame):
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
 
-
+    def OnExit(self, evt):
+        self.Close()
 
 #---------------------------------------------------------------------------
 
@@ -99,5 +105,6 @@ overview = """\
 
 
 if __name__ == '__main__':
-    app = App(0)
+#    app = App(0)
+    app = glmdl.RunDemoApp()
     app.MainLoop()

@@ -3,7 +3,7 @@
 import sys,os
 import wx
 from wx import xrc
-import OpenGLMdl as glmdl  
+import OpenGLMdl as glmdl
 
 """ 
 
@@ -11,59 +11,61 @@ import OpenGLMdl as glmdl
 
 #---------------------------------------------------------------------------
 
-class MyFrame0(wx.Frame):
-    def __init__(self, parent, ID, title):
-        wx.Frame.__init__(self, parent, -1, title, size = (800,500), 
-            style=wx.DEFAULT_FRAME_STYLE|wx.NO_FULL_REPAINT_ON_RESIZE)
+class MyApp(wx.App):
+    def OnInit(self):
+        self.res = xrc.XmlResource('res.xrc')
 
-
-        # make a statusbar
-        self.CreateStatusBar()
-        self.SetStatusText("This is the statusbar")
-
+        self.frame = self.res.LoadFrame(None, 'mainframe')
+        
+        self.pnlCanvas = xrc.XRCCTRL(self.frame, 'pnlCanvas')
+        
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        c = glmdl.CubeCanvas(self.pnlCanvas)
+        c.SetMinSize((200, 200))
+        sizer.Add(c, 0, wx.ALIGN_CENTER|wx.ALL, 15)
+        self.pnlCanvas.SetAutoLayout(True)
+        self.pnlCanvas.SetSizer(sizer)
+        
         # Make a menu
         menuBar = wx.MenuBar()
 
         # 1st menu from left
         menu = wx.Menu()
-        menu.Append(wx.ID_NEW,     "&New")
         menu.Append(wx.ID_OPEN,    "&Open...")
         menu.Append(wx.ID_CLOSE,   "&Close")
-        menu.Append(wx.ID_SAVE,    "&Save")
-        menu.Append(wx.ID_SAVEAS,  "Save &as...")
+        menu.AppendSeparator()
         menu.Append(wx.ID_EXIT,    "&Exit", "Exit The Tool")
-        menu.Enable(wx.ID_NEW, False)
         menu.Enable(wx.ID_CLOSE, False)
-        menu.Enable(wx.ID_SAVE, False)
-        menu.Enable(wx.ID_SAVEAS, False)
         menuBar.Append(menu, "&File")
 
-        self.SetMenuBar(menuBar)
+        self.frame.SetMenuBar(menuBar)
 
         # and a file history
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(menu)
 
-        
-        
-        self.Bind(wx.EVT_MENU, self.OnFileOpenDialog, id=wx.ID_OPEN)
-        self.Bind(wx.EVT_MENU, self.OnExit, id=wx.ID_EXIT)
-        self.Bind(
+        self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
+        self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
+        self.frame.Bind(
             wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9
             )
-        self.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
+        self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
 
-
-        self.Show(True)
-
-
+        self.frame.SetSize((800,400))
+        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
+        
+        self.SetTopWindow(self.frame)
+        self.frame.Show()
+        
+        return True
+    
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
         del self.filehistory
 #        self.menu.Destroy()
-
-    def OnFileOpenDialog(self, evt):
-        dlg = wx.FileDialog(self,
+    
+    def OnOpenFile(self, evt):
+        dlg = wx.FileDialog(self.frame,
                            defaultDir = os.getcwd(),
                            wildcard = "All Files|*",
                            style = wx.OPEN | wx.CHANGE_DIR)
@@ -76,7 +78,6 @@ class MyFrame0(wx.Frame):
             self.filehistory.AddFileToHistory(path)
 
         dlg.Destroy()
-
     def OnFileHistory(self, evt):
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1
@@ -85,31 +86,10 @@ class MyFrame0(wx.Frame):
 
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
+   
+    def OnExitApp(self, evt):
+        self.frame.Close(True)
 
-    def OnExit(self, evt):
-        self.Close()
-
-#---------------------------------------------------------------------------
-
-class MyApp(wx.App):
-    def OnInit(self):
-#        frame = MyFrame(None, -1, "test")
-#        self.SetTopWindow(frame)
-        self.res = xrc.XmlResource('res.xrc')
-        self.init_frame()
-        return True
-
-    def init_frame(self):
-#        frame_1 = MyFrame(None, -1, "")
-#        app.SetTopWindow(frame_1)
-#        frame_1.Show()
-        self.frame = self.res.LoadFrame(None, 'mainframe')
-        self.menubar = self.res.LoadMenuBar('menubar')
-        self.toolbar = self.res.LoadToolBar(self.frame, name='toolbar')
-        self.frame.SetMenuBar(self.menubar)
-        
-        self.SetTopWindow(self.frame)
-        self.frame.Show()
 #---------------------------------------------------------------------------
 
 

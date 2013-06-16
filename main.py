@@ -2,6 +2,7 @@
 
 import sys,os
 import wx
+from wx import xrc
 import OpenGLMdl as glmdl  
 
 """ 
@@ -10,7 +11,7 @@ import OpenGLMdl as glmdl
 
 #---------------------------------------------------------------------------
 
-class MyFrame(wx.Frame):
+class MyFrame0(wx.Frame):
     def __init__(self, parent, ID, title):
         wx.Frame.__init__(self, parent, -1, title, size = (800,500), 
             style=wx.DEFAULT_FRAME_STYLE|wx.NO_FULL_REPAINT_ON_RESIZE)
@@ -90,13 +91,25 @@ class MyFrame(wx.Frame):
 
 #---------------------------------------------------------------------------
 
-class App(wx.App):
+class MyApp(wx.App):
     def OnInit(self):
-        frame = MyFrame(None, -1, "test")
-        self.SetTopWindow(frame)
-
+#        frame = MyFrame(None, -1, "test")
+#        self.SetTopWindow(frame)
+        self.res = xrc.XmlResource('res.xrc')
+        self.init_frame()
         return True
 
+    def init_frame(self):
+#        frame_1 = MyFrame(None, -1, "")
+#        app.SetTopWindow(frame_1)
+#        frame_1.Show()
+        self.frame = self.res.LoadFrame(None, 'mainframe')
+        self.menubar = self.res.LoadMenuBar('menubar')
+        self.toolbar = self.res.LoadToolBar(self.frame, name='toolbar')
+        self.frame.SetMenuBar(self.menubar)
+        
+        self.SetTopWindow(self.frame)
+        self.frame.Show()
 #---------------------------------------------------------------------------
 
 
@@ -105,6 +118,6 @@ overview = """\
 
 
 if __name__ == '__main__':
-#    app = App(0)
-    app = glmdl.RunDemoApp()
+    app = MyApp(0)
+#    app = glmdl.RunDemoApp()
     app.MainLoop()

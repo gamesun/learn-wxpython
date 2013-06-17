@@ -4,6 +4,7 @@ import sys,os
 import wx
 from wx import xrc
 import OpenGLMdl as glmdl
+import layout as lyt
 
 """ 
 
@@ -13,19 +14,23 @@ import OpenGLMdl as glmdl
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.res = xrc.XmlResource('res.xrc')
-
-        self.frame = self.res.LoadFrame(None, 'mainframe')
+#        self.res = xrc.XmlResource('res.xrc')
+#        self.frame = self.res.LoadFrame(None, 'mainframe')
+#        scrollwin = xrc.XRCCTRL(self.frame, 'scrollwin')
+#        scrollwin.SetScrollbars(1,1,1,1)
+#        self.pnlCanvas = xrc.XRCCTRL(self.frame, 'pnlCanvas')
         
-        self.pnlCanvas = xrc.XRCCTRL(self.frame, 'pnlCanvas')
+        wx.InitAllImageHandlers()
+        self.frame = lyt.myFrame(None, wx.ID_ANY, "")
         
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        c = glmdl.CubeCanvas(self.pnlCanvas)
-        c.SetMinSize((200, 200))
-        sizer.Add(c, 0, wx.ALIGN_CENTER|wx.ALL, 15)
-        self.pnlCanvas.SetAutoLayout(True)
-        self.pnlCanvas.SetSizer(sizer)
+        self.canvas = glmdl.CubeCanvas(self.frame.pnlCanvas)
+        self.canvas.SetMinSize((200, 200))
+        sizer.Add(self.canvas, 1, wx.EXPAND|wx.ALL, 0)
+        self.frame.pnlCanvas.SetAutoLayout(True)
+        self.frame.pnlCanvas.SetSizer(sizer)
         
+        self.frame.scrollwin.Bind(wx.EVT_SCROLLWIN, self.OnScroll)
         # Make a menu
         menuBar = wx.MenuBar()
 
@@ -51,13 +56,21 @@ class MyApp(wx.App):
             )
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
 
-        self.frame.SetSize((800,400))
-        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
+#        self.frame.SetSize((100,100))
+#        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
         
         self.SetTopWindow(self.frame)
         self.frame.Show()
         
         return True
+    
+    def OnScroll(self, evt):
+        wx.CallAfter(self.OnScrolled)
+        evt.Skip()
+#        self.frame.scrollwin.Scroll( x=0, y=self.frame.scrollwin.CalcScrollInc(evt))
+
+    def OnScrolled(self):
+        self.canvas.Refresh(False)
     
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control

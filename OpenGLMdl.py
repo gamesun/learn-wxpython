@@ -52,9 +52,10 @@ class MyCanvasBase(glcanvas.GLCanvas):
         event.Skip()
 
     def DoSetViewport(self):
-        size = self.size = self.GetClientSize()
-        self.SetCurrent(self.context)
-        glViewport(0, 0, size.width, size.height)
+        if (self):
+            size = self.size = self.GetClientSize()
+            self.SetCurrent(self.context)
+            glViewport(0, 0, size.width, size.height)
         
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -69,7 +70,8 @@ class MyCanvasBase(glcanvas.GLCanvas):
         self.x, self.y = self.lastx, self.lasty = evt.GetPosition()
 
     def OnMouseUp(self, evt):
-        self.ReleaseMouse()
+        if self.HasCapture(): 
+            self.ReleaseMouse()
 
     def OnMouseMotion(self, evt):
         if evt.Dragging() and evt.LeftIsDown():

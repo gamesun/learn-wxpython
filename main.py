@@ -5,7 +5,7 @@ import wx
 from wx import xrc
 import OpenGLMdl as glmdl
 import layout as lyt
-
+import DataParser as dp
 """ 
 
 """
@@ -62,6 +62,15 @@ class MyApp(wx.App):
         self.SetTopWindow(self.frame)
         self.frame.Show()
         
+############################################
+        file = open('.\\dummy.txt', 'rU')
+        lstData = file.readlines()
+        file.close()
+        dp.Parser(lstData)
+        
+        self.OnExitApp(None)
+############################################
+        
         return True
     
     def OnScroll(self, evt):
@@ -89,8 +98,21 @@ class MyApp(wx.App):
 
             # add it to the history
             self.filehistory.AddFileToHistory(path)
-
+            
+            # read file
+            file = open(path, 'rU')
+            
+            # read file's all lines to a list
+            lstData = file.readlines()
+            
+            file.close()
+            
+            dp.Parser(lstData)
+            
         dlg.Destroy()
+        
+        
+        
     def OnFileHistory(self, evt):
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1

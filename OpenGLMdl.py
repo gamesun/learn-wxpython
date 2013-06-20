@@ -97,6 +97,16 @@ class CubeCanvas(MyCanvasBase):
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
 
+    def Line(self):
+        glColor3ub( 255, 0, 0 )
+        glBegin(GL_LINES)
+        
+        glVertex2f(0, 0)
+        glVertex2f(1000, 1000)
+        
+        glEnd()
+        self.SwapBuffers()
+        
     def OnDraw(self):
         # clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)

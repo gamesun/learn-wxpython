@@ -20,17 +20,21 @@ class MyApp(wx.App):
 #        scrollwin.SetScrollbars(1,1,1,1)
 #        self.pnlCanvas = xrc.XRCCTRL(self.frame, 'pnlCanvas')
         
-        wx.InitAllImageHandlers()
+        #wx.InitAllImageHandlers()
         self.frame = lyt.myFrame(None, wx.ID_ANY, "")
         
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.canvas = glmdl.CubeCanvas(self.frame.pnlCanvas)
-        self.canvas.SetMinSize((200, 200))
-        sizer.Add(self.canvas, 1, wx.EXPAND|wx.ALL, 0)
+        self.canvas.SetMinSize((1500, 450))
+#        sizer.Add(self.canvas, 1, wx.EXPAND|wx.ALL, 0)
+        sizer.Add(self.canvas, 1, wx.SHAPED|wx.ALL, 0)
         self.frame.pnlCanvas.SetAutoLayout(True)
         self.frame.pnlCanvas.SetSizer(sizer)
         
-        self.frame.scrollwin.Bind(wx.EVT_SCROLLWIN, self.OnScroll)
+        self.frame.pnlCanvas.Bind(wx.EVT_SCROLLWIN, self.OnScroll)
+        self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnEraseBakGnd)
+        
+        self.frame.pnlmain.Bind(wx.EVT_SCROLLWIN, self.OnScroll)
         # Make a menu
         menuBar = wx.MenuBar()
 
@@ -66,12 +70,22 @@ class MyApp(wx.App):
         file = open('.\\dummy.txt', 'rU')
         lstData = file.readlines()
         file.close()
-        dp.Parser(lstData)
+        dp.Parser(self.frame.pnlCanvas, self.canvas, lstData)
         
-        self.OnExitApp(None)
+
+        
+#        self.OnExitApp(None)
 ############################################
         
         return True
+    
+    def OnEraseBakGnd(self, evt):
+        #dc = wx.PaintDC(self.frame.pnlCanvas)
+        #dc.Clear()
+        #dc.SetPen(wx.Pen(wx.BLACK, 4))
+        #dc.DrawLine(0, 0, 50, 50)
+        wx.CallLater(100, self.OnScrolled)
+        evt.Skip()
     
     def OnScroll(self, evt):
         wx.CallAfter(self.OnScrolled)
@@ -79,8 +93,17 @@ class MyApp(wx.App):
 #        self.frame.scrollwin.Scroll( x=0, y=self.frame.scrollwin.CalcScrollInc(evt))
 
     def OnScrolled(self):
-        self.canvas.Refresh(False)
+        if (self.canvas):
+            self.canvas.Refresh(False)
     
+#    def OnScroll(self, evt=None):
+#        wx.CallAfter(self.OnScrolled)
+#        evt.Skip()
+#        
+#    def OnScrolled(self):
+#        x,y = self.frame.wdCanvas.GetViewStart()
+#        self.frame.wdTitle.Scroll(-1, y)
+
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
         del self.filehistory
@@ -107,7 +130,7 @@ class MyApp(wx.App):
             
             file.close()
             
-            dp.Parser(lstData)
+            dp.Parser(self.frame.pnlCanvas, self.canvas, lstData)
             
         dlg.Destroy()
         

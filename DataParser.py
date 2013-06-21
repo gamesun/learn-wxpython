@@ -9,13 +9,20 @@ import re
 
 g_match = re.compile('(?P<time>[0-9a-fA-F]{4}) (?P<value>[0-9a-fA-F]{8})')
 
-def Parser(pnl, canvas, list):
+def Parser(list):
     """
     parser the data and display results at the canvas.
+    Parser(list) -> [ [duration,]    info
+                      [[x1,y1], [x2,y2], ... [xn,yn]]    wave 1
+                      []    wave 2
+                      ...
+                      []    wave 32
+                    ]
     """
     
 #    for l in list:
 #        print l,
+    result = [[0]]
     
     tmp = [g_match.search(l) for l in list ]
     lstData = [t for t in tmp if t is not None]
@@ -25,10 +32,12 @@ def Parser(pnl, canvas, list):
     
     if 0 < len(lstData): 
         duration = int(lstData[-1].group('time'),16) - int(lstData[0].group('time'),16)
-        print duration
-        w,h = pnl.GetSize()
-        pnl.SetSize((duration,h))
-        canvas.Line()
+        result = [[duration]]
+#         print result
+        
+        
+
+    return result
 
 def DrawLine(data):
     """

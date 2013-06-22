@@ -2,41 +2,25 @@
 
 import sys,os
 import wx
-from wx import xrc
-import OpenGLMdl as glmdl
+# from wx import xrc
+# import OpenGLMdl as glmdl
 import layout as lyt
 import DataParser as dp
-from operator import add
-from functools import partial
+# from operator import add
+# from functools import partial
 
 """ 
 
 """
 
+WAVEFORM_H = 14
+WAVEFORM_H_OFFSET = 15
 #---------------------------------------------------------------------------
 
 class MyApp(wx.App):
     def OnInit(self):
-#        self.res = xrc.XmlResource('res.xrc')
-#        self.frame = self.res.LoadFrame(None, 'mainframe')
-#        scrollwin = xrc.XRCCTRL(self.frame, 'scrollwin')
-#        scrollwin.SetScrollbars(1,1,1,1)
-#        self.pnlCanvas = xrc.XRCCTRL(self.frame, 'pnlCanvas')
-        
-        #wx.InitAllImageHandlers()
         self.frame = lyt.myFrame(None, wx.ID_ANY, "")
         
-#         sizer = wx.BoxSizer(wx.HORIZONTAL)
-#         self.canvas = glmdl.CubeCanvas(self.frame.pnlCanvas)
-#         self.canvas.SetMinSize((1500, 450))
-# #        sizer.Add(self.canvas, 1, wx.EXPAND|wx.ALL, 0)
-#         sizer.Add(self.canvas, 1, wx.SHAPED|wx.ALL, 0)
-#         self.frame.pnlCanvas.SetAutoLayout(True)
-#         self.frame.pnlCanvas.SetSizer(sizer)
-        
-#         self.frame.pnlCanvas.Bind(wx.EVT_SCROLLWIN, self.OnScroll)
-#         self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnEraseBakGnd)
-#         self.frame.pnlmain.Bind(wx.EVT_SCROLLWIN, self.OnScroll)
         self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
         self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)
         self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
@@ -72,26 +56,35 @@ class MyApp(wx.App):
         self.SetTopWindow(self.frame)
         self.frame.Show()
         
+        self.waveform = []
 ############################################
         file = open('.\\dummy.txt', 'rU')
         lstData = file.readlines()
         file.close()
-        waveform = dp.Parser(lstData)
-        print waveform
-
+        self.waveform = dp.Parser(lstData)
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
+        
 #         self.frame.label1.SetLabel('')
         
-#        self.OnExitApp(None)
+#         self.OnExitApp()
 ############################################
         
         return True
     
-    def OnPaint(self, evt=None):
+    def OnPaint(self, evt = None):
         dc = wx.PaintDC(self.frame.pnlCanvas)
         dc.Clear()
-        dc.SetPen(wx.Pen(wx.BLACK, 2))
-        dc.DrawLine(0, 0, 500, 500)
-    
+        if 0 < len(self.waveform):
+            for i, w in enumerate(self.waveform[1]):
+                dc.SetPen(wx.Pen(wx.BLACK, 1))
+                self.DrawWave(dc, w, 20 * i)
+
+    def DrawWave(self, dc, coord, y_offset):
+        for i in range(len(coord) - 1):
+            dc.DrawLine(coord[i][0], coord[i][1] * WAVEFORM_H + y_offset, coord[i + 1][0], coord[i][1] * WAVEFORM_H + y_offset)
+            dc.DrawLine(coord[i + 1][0], coord[i][1] * WAVEFORM_H + y_offset, coord[i + 1][0], coord[i + 1][1] * WAVEFORM_H + y_offset)
+        
+        
 #     def OnEraseBakGnd(self, evt):
 #         #dc = wx.PaintDC(self.frame.pnlCanvas)
 #         #dc.Clear()
@@ -109,7 +102,7 @@ class MyApp(wx.App):
 #         if (self.canvas):
 #             self.canvas.Refresh(False)
     
-    def OnTitleScroll(self, evt=None):
+    def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
         evt.Skip()
         
@@ -117,7 +110,7 @@ class MyApp(wx.App):
         x,y = self.frame.wdTitle.GetViewStart()
         self.frame.wdCanvas.Scroll(-1, y)
 
-    def OnCanvasScroll(self, evt=None):
+    def OnCanvasScroll(self, evt = None):
         wx.CallAfter(self.OnCanvasScrolled)
         evt.Skip()
         
@@ -151,10 +144,13 @@ class MyApp(wx.App):
             
             file.close()
             
-            dp.Parser(self.frame.pnlCanvas, self.canvas, lstData)
+            self.frame.pnlCanvas.Refresh()      # clear the canvas
+            self.waveform = dp.Parser(lstData)
+            self.frame.pnlCanvas.SetSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
+            self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
+            self.frame.pnlCanvas.Refresh()      # display the waveforms
             
         dlg.Destroy()
-        
         
         
     def OnFileHistory(self, evt):
@@ -166,7 +162,7 @@ class MyApp(wx.App):
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
    
-    def OnExitApp(self, evt):
+    def OnExitApp(self, evt = None):
         self.frame.Close(True)
 
 #---------------------------------------------------------------------------
@@ -178,5 +174,4 @@ overview = """\
 
 if __name__ == '__main__':
     app = MyApp(0)
-#    app = glmdl.RunDemoApp()
     app.MainLoop()

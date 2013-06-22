@@ -58,11 +58,11 @@ class MyApp(wx.App):
         
         self.waveform = []
 ############################################
-        file = open('.\\dummy.txt', 'rU')
-        lstData = file.readlines()
-        file.close()
-        self.waveform = dp.Parser(lstData)
-        self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
+#         file = open('.\\dummy.txt', 'rU')
+#         lstData = file.readlines()
+#         file.close()
+#         self.waveform = dp.Parser(lstData)
+#         self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
         
 #         self.frame.label1.SetLabel('')
         

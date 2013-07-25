@@ -9,46 +9,32 @@ import re
 
 g_match = re.compile('(?P<time>[0-9a-fA-F]{4}) (?P<value>[0-9a-fA-F]{8})')
 
-def Parser(list):
+def Parser(lines):
     """
     parser the data and display results at the canvas.
-    Parser(list) -> [ (duration),    info
-                      ((x1,y1), (x2,y2), ... (xn,yn)),    wave 1
+    Parser(list) -> [ duration,    info
+                      [((x1,y1), (x2,y2), ... (xn,yn)),    wave 1
                       (...),    wave 2
-                      ...
-                      (...))]    wave 32
+                      ...  ]]
     """
+
+    RawData = [g_match.search(l) for l in lines]                                    # get the origin data
+    list = [(r.group('time'), r.group('value')) for r in RawData if r is not None]  # filter the null data
+    list.sort()
     
-#    for l in list:
-#        print l,
-    result = []
-    
-    tmp = [g_match.search(l) for l in list ]
-    lstData = [t for t in tmp if t is not None]
-    
-    if 0 < len(lstData): 
-        duration = int(lstData[-1].group('time'), 16) - int(lstData[0].group('time'), 16)
-        result = [[duration]]
-#         print result
-        matrix = []
-        for d in lstData:
-#             print d.group('time') , #d.group('value'),
-            matrix.append([(int(d.group('time'), base = 16), int(v)) for v in bits(int(d.group('value'), base = 16), 32)])
-                
-        result.append(zip(*matrix))
-            
-    return result
+    if 0 < len(list):
+        matrix = [[(int(l[0], base = 16), int(v)) for v in bits(int(l[1], base = 16), 32)] for l in list]
+        return (int(list[-1][0], 16) - int(list[0][0], 16), zip(*matrix))
+    return
 
 def bits(data):
     while data:
-        b = data & 0x01
-        yield b
+        yield data & 1
         data >>= 1
 
 def bits(data, bits):
     for i in xrange(bits):
-        b = data & 0x01
-        yield b
+        yield data & 1
         data >>= 1
     
 def Scale(factor):

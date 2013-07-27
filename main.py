@@ -4,7 +4,7 @@ import sys,os
 import wx
 # from wx import xrc
 # import OpenGLMdl as glmdl
-import layout as lyt
+import layout
 import DataParser as dp
 # from operator import add
 # from functools import partial
@@ -19,7 +19,7 @@ WAVEFORM_H_OFFSET = WAVEFORM_H + 2
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.frame = lyt.myFrame(None, wx.ID_ANY, "")
+        self.frame = layout.myFrame(None, wx.ID_ANY, "")
         
         self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
         self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)

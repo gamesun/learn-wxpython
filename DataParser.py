@@ -23,7 +23,7 @@ def Parser(lines):
     list.sort()
     
     if 0 < len(list):
-        matrix = [[(int(l[0], base = 16), int(v)) for v in bits(int(l[1], base = 16), 32)] for l in list]
+        matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
         return (int(list[-1][0], 16) - int(list[0][0], 16), zip(*matrix))
     return
 

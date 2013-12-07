@@ -13,8 +13,8 @@ import DataParser as dp
 
 """
 WAVEFORM_W = 5
-WAVEFORM_H = 14
-WAVEFORM_H_OFFSET = WAVEFORM_H + 2
+WAVEFORM_H = 12
+WAVEFORM_H_OFFSET = 16
 #---------------------------------------------------------------------------
 
 class MyApp(wx.App):
@@ -50,7 +50,6 @@ class MyApp(wx.App):
             )
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
 
-#        self.frame.SetSize((100,100))
 #        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
         
         self.SetTopWindow(self.frame)
@@ -77,30 +76,12 @@ class MyApp(wx.App):
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
-                self.DrawWave(dc, w, WAVEFORM_W, WAVEFORM_H_OFFSET * i)
+                self.DrawWave(dc, w, WAVEFORM_W, WAVEFORM_H_OFFSET * (31-i))
 
     def DrawWave(self, dc, coord, x_offset, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
             dc.DrawLine(c0[0] + x_offset, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_offset, c0[1] * WAVEFORM_H + y_offset)
             dc.DrawLine(c1[0] + x_offset, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_offset, c1[1] * WAVEFORM_H + y_offset)
-        
-        
-#     def OnEraseBakGnd(self, evt):
-#         #dc = wx.PaintDC(self.frame.pnlCanvas)
-#         #dc.Clear()
-#         #dc.SetPen(wx.Pen(wx.BLACK, 4))
-#         #dc.DrawLine(0, 0, 50, 50)
-#         wx.CallLater(100, self.OnScrolled)
-#         evt.Skip()
-#     
-#     def OnScroll(self, evt):
-#         wx.CallAfter(self.OnScrolled)
-#         evt.Skip()
-# #        self.frame.scrollwin.Scroll( x=0, y=self.frame.scrollwin.CalcScrollInc(evt))
-# 
-#     def OnScrolled(self):
-#         if (self.canvas):
-#             self.canvas.Refresh(False)
     
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
@@ -149,9 +130,6 @@ class MyApp(wx.App):
             self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_W, 32 * WAVEFORM_H_OFFSET))
             self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_W, 32 * WAVEFORM_H_OFFSET))
             self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
-#             self.frame.pnlCanvas.SetScrollPos(wx.HORIZONTAL , 100)
-#             self.frame.wdCanvas.Refresh()      # display the waveforms
-#             self.frame.wdCanvas.UpdateWindowUI()
             
         dlg.Destroy()
         

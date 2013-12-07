@@ -43,6 +43,11 @@ class MyApp(wx.App):
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(menu)
 
+
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnTimer)
+        self.timer.Start(100)    # ms
+        
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
         self.frame.Bind(
@@ -69,6 +74,13 @@ class MyApp(wx.App):
 ############################################
         
         return True
+    
+    def OnTimer(self, evt):
+        pos = wx.GetMousePosition()
+        rect = self.frame.wdCanvas.GetRect()
+        pos = self.frame.ScreenToClient(pos)
+        if rect.Contains(pos):
+            print pos.x, pos.y
     
     def OnPaint(self, evt = None):
         dc = wx.PaintDC(self.frame.pnlCanvas)
@@ -144,6 +156,7 @@ class MyApp(wx.App):
         self.filehistory.AddFileToHistory(path)
    
     def OnExitApp(self, evt = None):
+        self.timer.Stop()
         self.frame.Close(True)
 
 #---------------------------------------------------------------------------

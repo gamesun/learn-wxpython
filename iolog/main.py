@@ -5,14 +5,14 @@ import wx
 # from wx import xrc
 # import OpenGLMdl as glmdl
 import layout
-import DataParser as dp
+import re
 # from operator import add
 # from functools import partial
 
 """ 
 
 """
-WAVEFORM_W = 5
+WAVEFORM_X_MARGIN = 5
 WAVEFORM_H = 12
 WAVEFORM_H_OFFSET = 16
 #---------------------------------------------------------------------------
@@ -65,7 +65,7 @@ class MyApp(wx.App):
 #         file = open('.\\dummy.txt', 'rU')
 #         lstData = file.readlines()
 #         file.close()
-#         self.waveform = dp.Parser(lstData)
+#         self.waveform = Parser(lstData)
 #         self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
         
 #         self.frame.label1.SetLabel('')
@@ -80,7 +80,10 @@ class MyApp(wx.App):
         rect = self.frame.wdCanvas.GetRect()
         pos = self.frame.ScreenToClient(pos)
         if rect.Contains(pos):
-            print pos.x, pos.y
+            #print pos.x, pos.y
+            print (pos.x - WAVEFORM_X_MARGIN - rect.x)
+#            print pos.y / WAVEFORM_H_OFFSET
+            
     
     def OnPaint(self, evt = None):
         dc = wx.PaintDC(self.frame.pnlCanvas)
@@ -88,12 +91,12 @@ class MyApp(wx.App):
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
-                self.DrawWave(dc, w, WAVEFORM_W, WAVEFORM_H_OFFSET * (31-i))
+                self.DrawWave(dc, w, WAVEFORM_X_MARGIN, WAVEFORM_H_OFFSET * (31-i))
 
-    def DrawWave(self, dc, coord, x_offset, y_offset):
+    def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
-            dc.DrawLine(c0[0] + x_offset, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_offset, c0[1] * WAVEFORM_H + y_offset)
-            dc.DrawLine(c1[0] + x_offset, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_offset, c1[1] * WAVEFORM_H + y_offset)
+            dc.DrawLine(c0[0] + x_margin, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_margin, c0[1] * WAVEFORM_H + y_offset)
+            dc.DrawLine(c1[0] + x_margin, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_margin, c1[1] * WAVEFORM_H + y_offset)
     
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
@@ -138,9 +141,9 @@ class MyApp(wx.App):
             file.close()
             
             self.frame.pnlCanvas.Refresh()      # clear the canvas
-            self.waveform = dp.Parser(lstData)
-            self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_W, 32 * WAVEFORM_H_OFFSET))
-            self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_W, 32 * WAVEFORM_H_OFFSET))
+            self.waveform = Parser(lstData)
+            self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+            self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
             self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
             
         dlg.Destroy()

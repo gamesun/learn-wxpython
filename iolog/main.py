@@ -50,7 +50,7 @@ class MyApp(wx.App):
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(menu)
 
-
+        self.arrow = [0, 0, 0, 0]
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(100)    # ms
@@ -87,11 +87,20 @@ class MyApp(wx.App):
         rect = self.frame.wdCanvas.GetRect()
         pos = self.frame.ScreenToClient(pos)
         if rect.Contains(pos):
-            #print pos.x, pos.y
-            print (pos.x - WAVEFORM_X_MARGIN - rect.x)
-#            print binary_search()
-#            print pos.y / WAVEFORM_H_OFFSET
-            
+            if 0 < len(self.waveform):
+                line = pos.y / WAVEFORM_H_OFFSET
+                idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN - rect.x, line)
+                arrowNew = [0,0,0,0]
+                arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
+                arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
+                arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
+                if self.arrow != arrowNew:
+                    self.arrow = arrowNew
+                    self.frame.wdCanvas.Refresh(False)
+    
+    def SearchIndex(self, px, py):
+        l_x = [p[0] for p in self.waveform[1][py]]
+        return bisect_left(l_x, px)
     
     def OnPaint(self, evt = None):
         dc = wx.PaintDC(self.frame.pnlCanvas)
@@ -100,12 +109,19 @@ class MyApp(wx.App):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
                 self.DrawWave(dc, w, WAVEFORM_X_MARGIN, WAVEFORM_H_OFFSET * (31-i))
+#            dc.DrawLine(self.arrow[0], self.arrow[1], self.arrow[2], self.arrow[3])
+            self.DrawArrow(dc, self.arrow)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
             dc.DrawLine(c0[0] + x_margin, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_margin, c0[1] * WAVEFORM_H + y_offset)
             dc.DrawLine(c1[0] + x_margin, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_margin, c1[1] * WAVEFORM_H + y_offset)
     
+    def DrawArrow(self, dc, coord):
+        dc.DrawLine(coord[0], coord[1], coord[2], coord[3])
+        dc.DrawLines([[coord[0]+2,coord[1]-2],[coord[0],coord[1]],[coord[0]+3,coord[1]+3]])
+        dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
+            
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
         evt.Skip()
@@ -189,7 +205,7 @@ def Parser(lines):
     
     if 0 < len(list):
         matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
-        return (int(list[-1][0], 16) - int(list[0][0], 16), zip(*matrix))
+        return (int(list[-1][0], 16) - int(list[0][0], 16), zip(*matrix))           # zip(*matrix): Transpose the matrix
     return
 
 def bits(data):

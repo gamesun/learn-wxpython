@@ -108,7 +108,7 @@ class MyApp(wx.App):
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
-                self.DrawWave(dc, w, WAVEFORM_X_MARGIN, WAVEFORM_H_OFFSET * (31-i))
+                self.DrawWave(dc, w, WAVEFORM_X_MARGIN, WAVEFORM_H_OFFSET * i)
 #            dc.DrawLine(self.arrow[0], self.arrow[1], self.arrow[2], self.arrow[3])
             self.DrawArrow(dc, self.arrow)
 
@@ -193,7 +193,7 @@ g_match = re.compile('(?P<time>[0-9a-fA-F]{4}) (?P<value>[0-9a-fA-F]{8})')
 def Parser(lines):
     """
     parser the data and display results at the canvas.
-    Parser(list) -> [ duration,    info
+    Parser(list) -> [ duration,                            #info
                       [((x1,y1), (x2,y2), ... (xn,yn)),    #wave 1
                       (...),                               #wave 2
                       ...  ]]
@@ -205,7 +205,10 @@ def Parser(lines):
     
     if 0 < len(list):
         matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
-        return (int(list[-1][0], 16) - int(list[0][0], 16), zip(*matrix))           # zip(*matrix): Transpose the matrix
+        matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
+        matrix = [[p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
+        print matrix
+        return (int(list[-1][0], 16) - int(list[0][0], 16), matrix)
     return
 
 def bits(data):

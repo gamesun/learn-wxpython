@@ -88,6 +88,7 @@ class MyApp(wx.App):
         pos = self.frame.ScreenToClient(pos)
         if rect.Contains(pos):
             if 0 < len(self.waveform):
+                (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
                 line = pos.y / WAVEFORM_H_OFFSET
                 idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN - rect.x, line)
                 arrowNew = [0,0,0,0]

@@ -181,51 +181,67 @@ class MyApp(wx.App):
     def OnZoom1(self, evt):
         self.zoom = 500.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom2(self, evt):
         self.zoom = 400.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom3(self, evt):
         self.zoom = 300.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom4(self, evt):
         self.zoom = 250.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom5(self, evt):
         self.zoom = 200.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom6(self, evt):
         self.zoom = 150.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom7(self, evt):
         self.zoom = 100.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom8(self, evt):
         self.zoom = 90.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom9(self, evt):
         self.zoom = 80.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom10(self, evt):
         self.zoom = 70.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom11(self, evt):
         self.zoom = 60.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom12(self, evt):
         self.zoom = 50.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom13(self, evt):
         self.zoom = 40.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom14(self, evt):
         self.zoom = 30.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom15(self, evt):
         self.zoom = 20.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
     def OnZoom16(self, evt):
         self.zoom = 10.0 / 100
         self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.frame.wdCanvas.Refresh(False)
         
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)

@@ -312,7 +312,7 @@ def Parser(lines):
     if 0 < len(list):
         matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
         matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
-        matrix = [[p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
+        matrix = [[line[0],] + [p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
         print matrix
         return [int(list[-1][0], 16) - int(list[0][0], 16), matrix]
     return

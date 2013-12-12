@@ -86,7 +86,7 @@ class MyApp(wx.App):
         self.filehistory.UseMenu(menu)
 
         self.zoom = 1
-        self.arrow = [0, 0, 0, 0]
+        self.arrow = None
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(100)    # ms
@@ -150,7 +150,7 @@ class MyApp(wx.App):
                 arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
                 arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
                 if self.arrow != arrowNew:
-                    self.arrow = arrowNew
+                    self.arrow = arrowNew[:]
                     self.frame.wdCanvas.Refresh(False)
     
     def SearchIndex(self, px, py):
@@ -165,7 +165,8 @@ class MyApp(wx.App):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
                 self.DrawWave(dc, w, WAVEFORM_X_MARGIN, WAVEFORM_H_OFFSET * i)
 #            dc.DrawLine(self.arrow[0], self.arrow[1], self.arrow[2], self.arrow[3])
-            self.DrawArrow(dc, self.arrow)
+            if self.arrow is not None:
+                self.DrawArrow(dc, self.arrow)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -179,68 +180,132 @@ class MyApp(wx.App):
             
             
     def OnZoom1(self, evt):
+        self.arrow = None
         self.zoom = 500.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom2(self, evt):
+        self.arrow = None
         self.zoom = 400.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom3(self, evt):
+        self.arrow = None
         self.zoom = 300.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom4(self, evt):
+        self.arrow = None
         self.zoom = 250.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom5(self, evt):
+        self.arrow = None
         self.zoom = 200.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom6(self, evt):
+        self.arrow = None
         self.zoom = 150.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom7(self, evt):
+        self.arrow = None
         self.zoom = 100.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom8(self, evt):
+        self.arrow = None
         self.zoom = 90.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom9(self, evt):
+        self.arrow = None
         self.zoom = 80.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom10(self, evt):
+        self.arrow = None
         self.zoom = 70.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom11(self, evt):
+        self.arrow = None
         self.zoom = 60.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom12(self, evt):
+        self.arrow = None
         self.zoom = 50.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom13(self, evt):
+        self.arrow = None
         self.zoom = 40.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom14(self, evt):
+        self.arrow = None
         self.zoom = 30.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom15(self, evt):
+        self.arrow = None
         self.zoom = 20.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
     def OnZoom16(self, evt):
+        self.arrow = None
         self.zoom = 10.0 / 100
-        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        self.waveform = [self.originWave[0]*self.zoom,[[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
         
     def OnTitleScroll(self, evt = None):
@@ -277,20 +342,7 @@ class MyApp(wx.App):
             # add it to the history
             self.filehistory.AddFileToHistory(path)
             
-            # read file
-            file = open(path, 'rU')
-            
-            # read file's all lines to a list
-            lstData = file.readlines()
-            
-            file.close()
-            
-            self.frame.pnlCanvas.Refresh()      # clear the canvas
-            self.originWave = Parser(lstData)
-            self.waveform = self.originWave[:]
-            self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
-            self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
-            self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
+            self.ReadFile(path)
             
         dlg.Destroy()
         
@@ -301,8 +353,26 @@ class MyApp(wx.App):
         path = self.filehistory.GetHistoryFile(fileNum)
         print "You selected %s\n" % path,
 
+        self.ReadFile(path)
+        
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
+
+    def ReadFile(self, path):
+        # read file
+        file = open(path, 'rU')
+        
+        # read file's all lines to a list
+        lstData = file.readlines()
+        
+        file.close()
+        
+        self.frame.pnlCanvas.Refresh()      # clear the canvas
+        self.originWave = Parser(lstData)
+        self.waveform = self.originWave[:]
+        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
 
     def OnExitApp(self, evt = None):
         self.timer.Stop()

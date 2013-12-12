@@ -21,7 +21,6 @@ def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for h
     hi = hi if hi is not None else len(a) # hi defaults to len(a)   
     pos = bisect_left(a,x,lo,hi)          # find insertion position
     return (pos if pos != hi and a[pos] == x else -1) # don't walk off the end
-
 #---------------------------------------------------------------------------
 
 class MyApp(wx.App):
@@ -43,13 +42,50 @@ class MyApp(wx.App):
         menu.Append(wx.ID_EXIT,    "&Exit", "Exit The Tool")
         menu.Enable(wx.ID_CLOSE, False)
         menuBar.Append(menu, "&File")
-
+        
+        # 2rd menu
+        menuZoom = wx.Menu()
+        idZoom1 = wx.NewId()
+        idZoom2 = wx.NewId()
+        idZoom3 = wx.NewId()
+        idZoom4 = wx.NewId()
+        idZoom5 = wx.NewId()
+        idZoom6 = wx.NewId()
+        idZoom7 = wx.NewId()
+        idZoom8 = wx.NewId()
+        idZoom9 = wx.NewId()
+        idZoom10 = wx.NewId()
+        idZoom11 = wx.NewId()
+        idZoom12 = wx.NewId()
+        idZoom13 = wx.NewId()
+        idZoom14 = wx.NewId()
+        idZoom15 = wx.NewId()
+        idZoom16 = wx.NewId()
+        menuZoom.AppendRadioItem(idZoom1, "500%" )
+        menuZoom.AppendRadioItem(idZoom2, "400%" )
+        menuZoom.AppendRadioItem(idZoom3, "300%" )
+        menuZoom.AppendRadioItem(idZoom4, "250%" )
+        menuZoom.AppendRadioItem(idZoom5, "200%" )
+        menuZoom.AppendRadioItem(idZoom6, "150%" )
+        menuZoom.AppendRadioItem(idZoom7, "100%" )
+        menuZoom.AppendRadioItem(idZoom8, "90%"  )
+        menuZoom.AppendRadioItem(idZoom9, "80%"  )
+        menuZoom.AppendRadioItem(idZoom10, "70%" )
+        menuZoom.AppendRadioItem(idZoom11, "60%" )
+        menuZoom.AppendRadioItem(idZoom12, "50%" )
+        menuZoom.AppendRadioItem(idZoom13, "40%" )
+        menuZoom.AppendRadioItem(idZoom14, "30%" )
+        menuZoom.AppendRadioItem(idZoom15, "20%" )
+        menuZoom.AppendRadioItem(idZoom16, "10%" )
+        menuBar.Append(menuZoom, "&Zoom")
+        
         self.frame.SetMenuBar(menuBar)
 
         # and a file history
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(menu)
 
+        self.zoom = 1
         self.arrow = [0, 0, 0, 0]
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
@@ -61,12 +97,30 @@ class MyApp(wx.App):
             wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9
             )
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
+        
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom1, id = idZoom1)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom2, id = idZoom2)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom3, id = idZoom3)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom4, id = idZoom4)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom5, id = idZoom5)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom6, id = idZoom6)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom7, id = idZoom7)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom8, id = idZoom8)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom9, id = idZoom9)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom10, id = idZoom10)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom11, id = idZoom11)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom12, id = idZoom12)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom13, id = idZoom13)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom14, id = idZoom14)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom15, id = idZoom15)
+        self.frame.Bind(wx.EVT_MENU, self.OnZoom16, id = idZoom16)
 
 #        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
         
         self.SetTopWindow(self.frame)
         self.frame.Show()
         
+        self.originWave = []
         self.waveform = []
 ############################################
 #         file = open('.\\dummy.txt', 'rU')
@@ -123,6 +177,56 @@ class MyApp(wx.App):
         dc.DrawLines([[coord[0]+2,coord[1]-2],[coord[0],coord[1]],[coord[0]+3,coord[1]+3]])
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
             
+            
+    def OnZoom1(self, evt):
+        self.zoom = 500.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom2(self, evt):
+        self.zoom = 400.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom3(self, evt):
+        self.zoom = 300.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom4(self, evt):
+        self.zoom = 250.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom5(self, evt):
+        self.zoom = 200.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom6(self, evt):
+        self.zoom = 150.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom7(self, evt):
+        self.zoom = 100.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom8(self, evt):
+        self.zoom = 90.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom9(self, evt):
+        self.zoom = 80.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom10(self, evt):
+        self.zoom = 70.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom11(self, evt):
+        self.zoom = 60.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom12(self, evt):
+        self.zoom = 50.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom13(self, evt):
+        self.zoom = 40.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom14(self, evt):
+        self.zoom = 30.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom15(self, evt):
+        self.zoom = 20.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+    def OnZoom16(self, evt):
+        self.zoom = 10.0 / 100
+        self.waveform[1] = [[(p[0]*self.zoom, p[1]) for p in line] for line in self.originWave[1]]
+        
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
         evt.Skip()
@@ -166,7 +270,8 @@ class MyApp(wx.App):
             file.close()
             
             self.frame.pnlCanvas.Refresh()      # clear the canvas
-            self.waveform = Parser(lstData)
+            self.originWave = Parser(lstData)
+            self.waveform = self.originWave[:]
             self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
             self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
             self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
@@ -182,7 +287,7 @@ class MyApp(wx.App):
 
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
-   
+
     def OnExitApp(self, evt = None):
         self.timer.Stop()
         self.frame.Close(True)
@@ -209,7 +314,7 @@ def Parser(lines):
         matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
         matrix = [[p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
         print matrix
-        return (int(list[-1][0], 16) - int(list[0][0], 16), matrix)
+        return [int(list[-1][0], 16) - int(list[0][0], 16), matrix]
     return
 
 def bits(data):

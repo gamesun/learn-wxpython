@@ -369,7 +369,7 @@ class MyApp(wx.App):
         
         self.frame.pnlCanvas.Refresh()      # clear the canvas
         self.originWave = Parser(lstData)
-        self.waveform = self.originWave[:]
+        self.waveform = list(self.originWave)
         self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
         self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
@@ -400,7 +400,7 @@ def Parser(lines):
         matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
         matrix = [[line[0],] + [p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
         print matrix
-        return [int(list[-1][0], 16) - int(list[0][0], 16), matrix]
+        return (int(list[-1][0], 16) - int(list[0][0], 16), matrix)
     return
 
 def bits(data):

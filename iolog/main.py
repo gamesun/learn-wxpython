@@ -122,6 +122,7 @@ class MyApp(wx.App):
         
         self.originWave = []
         self.waveform = []
+        self.measure_x = []
 ############################################
 #         file = open('.\\dummy.txt', 'rU')
 #         lstData = file.readlines()
@@ -152,6 +153,13 @@ class MyApp(wx.App):
                 if self.arrow != arrowNew:
                     self.arrow = arrowNew[:]
                     self.frame.wdCanvas.Refresh(False)
+                    self.measure_x = [self.waveform[1][line][idx-1][0], self.waveform[1][line][idx][0]]
+                    str11 = 'T1:      %d' % self.waveform[1][line][idx-1][0]
+                    str12 = 'T2:      %d' % self.waveform[1][line][idx][0]
+                    str13 = '|T1-T2|= %d' % (self.waveform[1][line][idx][0] - self.waveform[1][line][idx-1][0])
+                    self.frame.lblMeasure11.SetLabel(str11)
+                    self.frame.lblMeasure12.SetLabel(str12)
+                    self.frame.lblMeasure13.SetLabel(str13)
     
     def SearchIndex(self, px, py):
         l_x = [p[0] for p in self.waveform[1][py]]

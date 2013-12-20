@@ -85,11 +85,13 @@ class MyApp(wx.App):
         self.filehistory = wx.FileHistory()
         self.filehistory.UseMenu(menu)
 
+        menuBar.Check(idZoom7, True)
+
         self.zoom = 1
         self.arrow = None
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
-        self.timer.Start(100)    # ms
+        self.timer.Start(50)    # ms
         
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
@@ -115,13 +117,26 @@ class MyApp(wx.App):
         self.frame.Bind(wx.EVT_MENU, self.OnZoom15, id = idZoom15)
         self.frame.Bind(wx.EVT_MENU, self.OnZoom16, id = idZoom16)
 
+
+        self.frame.hyperlink_1.Bind(wx.EVT_HYPERLINK, self.OnHypeLink1)
+        self.frame.hyperlink_2.Bind(wx.EVT_HYPERLINK, self.OnHypeLink2)
+        self.frame.hyperlink_3.Bind(wx.EVT_HYPERLINK, self.OnHypeLink3)
+        self.frame.hyperlink_4.Bind(wx.EVT_HYPERLINK, self.OnHypeLink4)
+        self.frame.hyperlink_5.Bind(wx.EVT_HYPERLINK, self.OnHypeLink5)
+        self.frame.hyperlink_6.Bind(wx.EVT_HYPERLINK, self.OnHypeLink6)
+        self.frame.hyperlink_7.Bind(wx.EVT_HYPERLINK, self.OnHypeLink7)
+        self.frame.hyperlink_8.Bind(wx.EVT_HYPERLINK, self.OnHypeLink8)
+        
 #        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
         
         self.SetTopWindow(self.frame)
         self.frame.Show()
         
+        self.canvasSize = wx.Size()
+        self.mousePos = None
         self.originWave = []
         self.waveform = []
+        self.movingT = None
 ############################################
 #         file = open('.\\dummy.txt', 'rU')
 #         lstData = file.readlines()
@@ -135,16 +150,50 @@ class MyApp(wx.App):
 ############################################
         
         return True
-    
+
+    def OnHypeLink1(self, evt):
+        self.movingT = 1
+        
+    def OnHypeLink2(self, evt):
+        self.movingT = 2
+        
+    def OnHypeLink3(self, evt):
+        self.movingT = 3
+        
+    def OnHypeLink4(self, evt):
+        self.movingT = 4
+        
+    def OnHypeLink5(self, evt):
+        self.movingT = 5
+        
+    def OnHypeLink6(self, evt):
+        self.movingT = 6
+        
+    def OnHypeLink7(self, evt):
+        self.movingT = 7
+        
+    def OnHypeLink8(self, evt):
+        self.movingT = 8
+        
+
     def OnTimer(self, evt):
         pos = wx.GetMousePosition()
-        rect = self.frame.wdCanvas.GetRect()
+        try:
+            rect = self.frame.wdCanvas.GetRect()
+        except wx.PyDeadObjectError:
+            return
+        self.canvasSize = rect.GetSize()
         pos = self.frame.ScreenToClient(pos)
         if rect.Contains(pos):
+            (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
+            (pos.x, pos.y) = (pos.x - rect.x, pos.y)
+            if self.mousePos != pos:
+                self.mousePos = pos
+                self.frame.wdCanvas.Refresh(False)
+            
             if 0 < len(self.waveform):
-                (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
                 line = pos.y / WAVEFORM_H_OFFSET
-                idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN - rect.x, line)
+                idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN, line)
                 arrowNew = [0,0,0,0]
                 arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
                 arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
@@ -170,9 +219,11 @@ class MyApp(wx.App):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
                 self.DrawWave(dc, w, WAVEFORM_X_MARGIN, WAVEFORM_H_OFFSET * i)
-#            dc.DrawLine(self.arrow[0], self.arrow[1], self.arrow[2], self.arrow[3])
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
+        if self.movingT is not None:
+            self.DrawMeasureLine(dc, self.mousePos.x)
+                
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -184,7 +235,9 @@ class MyApp(wx.App):
         dc.DrawLines([[coord[0]+2,coord[1]-2],[coord[0],coord[1]],[coord[0]+3,coord[1]+3]])
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
             
-            
+    def DrawMeasureLine(self, dc, x):
+        dc.DrawLine(x, 0, x, self.canvasSize.GetHeight())
+        
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )
     def OnZoom2(self, evt):

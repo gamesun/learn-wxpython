@@ -27,9 +27,8 @@ class MyApp(wx.App):
     def OnInit(self):
         self.frame = layout.myFrame(None, wx.ID_ANY, "")
 
-        self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
-        self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)
-        self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
+        self.frame.wdTitle.SetScrollRate(10, WAVEFORM_H_OFFSET)
+        self.frame.wdCanvas.SetScrollRate(10, WAVEFORM_H_OFFSET)
 
         # Make a menu
         menuBar = wx.MenuBar()
@@ -101,6 +100,10 @@ class MyApp(wx.App):
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(10)    # ms
 
+        self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)
+        self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
+
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
         self.frame.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
@@ -140,6 +143,7 @@ class MyApp(wx.App):
         self.frame.Show()
 
         self.canvasSize = wx.Size()
+        self.canvasFullSize = wx.Size()
         self.mousePosOld = None
         self.originWave = []
         self.waveform = []
@@ -271,7 +275,7 @@ class MyApp(wx.App):
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
 
     def DrawMeasureLine(self, dc, x):
-        dc.DrawLine(x, 0, x, self.canvasSize.GetHeight())
+        dc.DrawLine(x, 0, x, self.canvasFullSize.GetHeight())
 
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )
@@ -377,8 +381,9 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.Refresh()      # clear the canvas
         self.originWave = Parser(lstData)
         self.waveform = list(self.originWave)
-        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
-        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
+        self.canvasFullSize = wx.Size(self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET)
+        self.frame.pnlCanvas.SetSize(self.canvasFullSize)
+        self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
 
     def OnExitApp(self, evt = None):

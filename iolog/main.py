@@ -10,7 +10,7 @@ import re
 # from functools import partial
 from bisect import bisect_left
 
-""" 
+"""
 
 """
 WAVEFORM_X_MARGIN = 5
@@ -18,7 +18,7 @@ WAVEFORM_H = 12
 WAVEFORM_H_OFFSET = 16
 
 def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for hi
-    hi = hi if hi is not None else len(a) # hi defaults to len(a)   
+    hi = hi if hi is not None else len(a) # hi defaults to len(a)
     pos = bisect_left(a,x,lo,hi)          # find insertion position
     return (pos if pos != hi and a[pos] == x else -1) # don't walk off the end
 #---------------------------------------------------------------------------
@@ -26,11 +26,11 @@ def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for h
 class MyApp(wx.App):
     def OnInit(self):
         self.frame = layout.myFrame(None, wx.ID_ANY, "")
-        
+
         self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
         self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)
         self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
-        
+
         # Make a menu
         menuBar = wx.MenuBar()
 
@@ -42,7 +42,7 @@ class MyApp(wx.App):
         menu.Append(wx.ID_EXIT,    "&Exit", "Exit The Tool")
         menu.Enable(wx.ID_CLOSE, False)
         menuBar.Append(menu, "&File")
-        
+
         # 2rd menu
         menuZoom = wx.Menu()
         idZoom1 = wx.NewId()
@@ -78,7 +78,7 @@ class MyApp(wx.App):
         menuZoom.AppendRadioItem(idZoom15, "20%" )
         menuZoom.AppendRadioItem(idZoom16, "10%" )
         menuBar.Append(menuZoom, "&Zoom")
-        
+
         self.frame.SetMenuBar(menuBar)
 
         # and a file history
@@ -91,15 +91,15 @@ class MyApp(wx.App):
         self.arrow = None
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
-        self.timer.Start(50)    # ms
-        
+        self.timer.Start(10)    # ms
+
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
         self.frame.Bind(
             wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9
             )
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
-        
+
         self.frame.Bind(wx.EVT_MENU, self.OnZoom1, id = idZoom1)
         self.frame.Bind(wx.EVT_MENU, self.OnZoom2, id = idZoom2)
         self.frame.Bind(wx.EVT_MENU, self.OnZoom3, id = idZoom3)
@@ -126,55 +126,57 @@ class MyApp(wx.App):
         self.frame.hyperlink_6.Bind(wx.EVT_HYPERLINK, self.OnHypeLink6)
         self.frame.hyperlink_7.Bind(wx.EVT_HYPERLINK, self.OnHypeLink7)
         self.frame.hyperlink_8.Bind(wx.EVT_HYPERLINK, self.OnHypeLink8)
-        
+
 #        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
-        
+
         self.SetTopWindow(self.frame)
         self.frame.Show()
-        
+
         self.canvasSize = wx.Size()
-        self.mousePos = None
+        self.mousePosOld = None
         self.originWave = []
         self.waveform = []
         self.movingT = None
+        self.movingT_x = 0
+
 ############################################
 #         file = open('.\\dummy.txt', 'rU')
 #         lstData = file.readlines()
 #         file.close()
 #         self.waveform = Parser(lstData)
 #         self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
-        
+
 #         self.frame.label1.SetLabel('')
-        
+
 #         self.OnExitApp()
 ############################################
-        
+
         return True
 
     def OnHypeLink1(self, evt):
         self.movingT = 1
-        
+
     def OnHypeLink2(self, evt):
         self.movingT = 2
-        
+
     def OnHypeLink3(self, evt):
         self.movingT = 3
-        
+
     def OnHypeLink4(self, evt):
         self.movingT = 4
-        
+
     def OnHypeLink5(self, evt):
         self.movingT = 5
-        
+
     def OnHypeLink6(self, evt):
         self.movingT = 6
-        
+
     def OnHypeLink7(self, evt):
         self.movingT = 7
-        
+
     def OnHypeLink8(self, evt):
         self.movingT = 8
-        
+
 
     def OnTimer(self, evt):
         pos = wx.GetMousePosition()
@@ -187,33 +189,55 @@ class MyApp(wx.App):
         if rect.Contains(pos):
             (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
             (pos.x, pos.y) = (pos.x - rect.x, pos.y)
-            if self.mousePos != pos:
-                self.mousePos = pos
+            if self.mousePosOld != pos:
+                self.mousePosOld = pos
+                self.movingT_x = pos.x
                 self.frame.wdCanvas.Refresh(False)
-            
+
             if 0 < len(self.waveform):
                 line = pos.y / WAVEFORM_H_OFFSET
-                idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN, line)
-                arrowNew = [0,0,0,0]
-                arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
-                arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
-                arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
-                if self.arrow != arrowNew:
-                    self.arrow = arrowNew[:]
-                    self.frame.wdCanvas.Refresh(False)
-                    str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
-                    str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
-                    str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
-                    self.frame.lblMeasure11.SetLabel(str11)
-                    self.frame.lblMeasure12.SetLabel(str12)
-                    self.frame.lblMeasure13.SetLabel(str13)
-    
+
+                if line < len(self.waveform[1]):
+                    idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN, line)
+                    if idx < len(self.waveform[1][line]):
+                        arrowNew = [0,0,0,0]
+                        arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
+                        arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
+                        arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
+                        if self.arrow != arrowNew:
+                            self.arrow = arrowNew[:]
+                            self.frame.wdCanvas.Refresh(False)
+                            str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
+                            str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
+                            str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
+                            self.frame.lblMeasure11.SetLabel(str11)
+                            self.frame.lblMeasure12.SetLabel(str12)
+                            self.frame.lblMeasure13.SetLabel(str13)
+
+                        if 0 < idx:
+                            distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WAVEFORM_X_MARGIN
+                            distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
+                            if distanceToBefore < distanceToAfter:
+                                if distanceToBefore < 20:
+                                    #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
+                                    self.movingT_x = pos.x - distanceToBefore
+
+                            else:
+                                if distanceToAfter < 20:
+                                    #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
+                                    self.movingT_x = pos.x + distanceToAfter
+                        else:
+                            distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
+                            if distanceToAfter < 20:
+                                    self.movingT_x = pos.x + distanceToAfter
+
     def SearchIndex(self, px, py):
         l_x = [p[0] for p in self.waveform[1][py]]
         return bisect_left(l_x, px)
-    
+
     def OnPaint(self, evt = None):
         dc = wx.PaintDC(self.frame.pnlCanvas)
+
         dc.Clear()
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
@@ -222,22 +246,21 @@ class MyApp(wx.App):
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
         if self.movingT is not None:
-            self.DrawMeasureLine(dc, self.mousePos.x)
-                
+            self.DrawMeasureLine(dc, self.movingT_x)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
             dc.DrawLine(c0[0] + x_margin, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_margin, c0[1] * WAVEFORM_H + y_offset)
             dc.DrawLine(c1[0] + x_margin, c0[1] * WAVEFORM_H + y_offset, c1[0] + x_margin, c1[1] * WAVEFORM_H + y_offset)
-    
+
     def DrawArrow(self, dc, coord):
         dc.DrawLine(coord[0], coord[1], coord[2], coord[3])
         dc.DrawLines([[coord[0]+2,coord[1]-2],[coord[0],coord[1]],[coord[0]+3,coord[1]+3]])
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
-            
+
     def DrawMeasureLine(self, dc, x):
         dc.DrawLine(x, 0, x, self.canvasSize.GetHeight())
-        
+
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )
     def OnZoom2(self, evt):
@@ -270,7 +293,7 @@ class MyApp(wx.App):
         self.Zoom( 0.2 )
     def OnZoom16(self, evt):
         self.Zoom( 0.1 )
-        
+
     def Zoom(self, factor):
         self.arrow = None
         self.waveform = [self.originWave[0]*factor,[[(p[0]*factor, p[1]) for p in line] for line in self.originWave[1]]]
@@ -278,12 +301,12 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.wdCanvas.Refresh(False)
-        
-        
+
+
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
         evt.Skip()
-        
+
     def OnTitleScrolled(self):
         x,y = self.frame.wdTitle.GetViewStart()
         self.frame.wdCanvas.Scroll(-1, y)
@@ -291,16 +314,16 @@ class MyApp(wx.App):
     def OnCanvasScroll(self, evt = None):
         wx.CallAfter(self.OnCanvasScrolled)
         evt.Skip()
-        
+
     def OnCanvasScrolled(self):
         x,y = self.frame.wdCanvas.GetViewStart()
         self.frame.wdTitle.Scroll(-1, y)
-        
+
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
         del self.filehistory
 #        self.menu.Destroy()
-    
+
     def OnOpenFile(self, evt):
         dlg = wx.FileDialog(self.frame,
                            defaultDir = os.getcwd(),
@@ -313,12 +336,12 @@ class MyApp(wx.App):
 
             # add it to the history
             self.filehistory.AddFileToHistory(path)
-            
+
             self.ReadFile(path)
-            
+
         dlg.Destroy()
-        
-        
+
+
     def OnFileHistory(self, evt):
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1
@@ -326,19 +349,19 @@ class MyApp(wx.App):
         print "You selected %s\n" % path,
 
         self.ReadFile(path)
-        
+
         # add it back to the history so it will be moved up the list
         self.filehistory.AddFileToHistory(path)
 
     def ReadFile(self, path):
         # read file
         file = open(path, 'rU')
-        
+
         # read file's all lines to a list
         lstData = file.readlines()
-        
+
         file.close()
-        
+
         self.frame.pnlCanvas.Refresh()      # clear the canvas
         self.originWave = Parser(lstData)
         self.waveform = list(self.originWave)
@@ -366,7 +389,7 @@ def Parser(lines):
     RawData = [g_match.search(l) for l in lines]                                    # get the origin data
     list = [(r.group('time'), r.group('value')) for r in RawData if r is not None]  # filter the null data
     list.sort()
-    
+
     if 0 < len(list):
         matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
         matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
@@ -384,7 +407,7 @@ def bits(data, bits):
     for i in xrange(bits):
         yield data & 1
         data >>= 1
-    
+
 
 
 overview = """\

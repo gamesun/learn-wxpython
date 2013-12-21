@@ -192,7 +192,7 @@ class MyApp(wx.App):
             if self.mousePosOld != pos:
                 self.mousePosOld = pos
                 self.movingT_x = pos.x
-                self.frame.wdCanvas.Refresh(False)
+                self.frame.pnlCanvas.Refresh(False)
 
             if 0 < len(self.waveform):
                 line = pos.y / WAVEFORM_H_OFFSET
@@ -206,7 +206,7 @@ class MyApp(wx.App):
                         arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
                         if self.arrow != arrowNew:
                             self.arrow = arrowNew[:]
-                            self.frame.wdCanvas.Refresh(False)
+                            self.frame.pnlCanvas.Refresh(False)
                             str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
                             str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
                             str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
@@ -221,7 +221,6 @@ class MyApp(wx.App):
                                 if distanceToBefore < 20:
                                     #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
                                     self.movingT_x = pos.x - distanceToBefore
-
                             else:
                                 if distanceToAfter < 20:
                                     #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
@@ -236,7 +235,7 @@ class MyApp(wx.App):
         return bisect_left(l_x, px)
 
     def OnPaint(self, evt = None):
-        dc = wx.PaintDC(self.frame.pnlCanvas)
+        dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
 
         dc.Clear()
         if 0 < len(self.waveform):
@@ -300,7 +299,7 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
         self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
-        self.frame.wdCanvas.Refresh(False)
+        self.frame.pnlCanvas.Refresh(False)
 
 
     def OnTitleScroll(self, evt = None):

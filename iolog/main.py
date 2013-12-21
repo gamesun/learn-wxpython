@@ -236,11 +236,11 @@ class MyApp(wx.App):
                                 distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WAVEFORM_X_MARGIN
                                 distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
                                 if distanceToBefore < distanceToAfter:
-                                    if distanceToBefore < 20:
+                                    if distanceToBefore < 30:
                                         #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
                                         self.movingT_x = pos.x - distanceToBefore
                                 else:
-                                    if distanceToAfter < 20:
+                                    if distanceToAfter < 30:
                                         #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
                                         self.movingT_x = pos.x + distanceToAfter
                             else:

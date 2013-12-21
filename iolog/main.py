@@ -1,5 +1,38 @@
-# -*- coding:utf-8 -*-
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+#
+# Copyright (c) 2013, gamesun
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#     * Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above
+# copyright notice, this list of conditions and the following disclaimer
+# in the documentation and/or other materials provided with the
+# distribution.
+#     * Neither the name of gamesun nor the names of its contributors
+# may be used to endorse or promote products derived from this software
+# without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY GAMESUN "AS IS" AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL GAMESUN BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+# IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
 
+import appInfo
+from wx.lib.wordwrap import wordwrap
 import sys,os
 import wx
 import layout
@@ -36,7 +69,7 @@ class MyApp(wx.App):
         menu.Enable(wx.ID_CLOSE, False)
         menuBar.Append(menu, "&File")
 
-        # 2rd menu
+        # 2nd menu
         menuZoom = wx.Menu()
         idZoom1 = wx.NewId()
         idZoom2 = wx.NewId()
@@ -72,11 +105,16 @@ class MyApp(wx.App):
         menuZoom.AppendRadioItem(idZoom16, "10%" )
         menuBar.Append(menuZoom, "&Zoom")
 
-        # 3th menu
+        # 3rd menu
         menuFunc = wx.Menu()
         idAutoAlign = wx.NewId()
         menuFunc.AppendCheckItem(idAutoAlign, "AutoAlign")
         menuBar.Append(menuFunc, "&Func")
+
+        # 4th menu
+        menuHelp = wx.Menu()
+        menuHelp.Append(wx.ID_ABOUT, "About")
+        menuBar.Append(menuHelp, "&Help")
 
         self.frame.SetMenuBar(menuBar)
 
@@ -121,6 +159,8 @@ class MyApp(wx.App):
         self.frame.Bind(wx.EVT_MENU, self.OnZoom16, id = idZoom16)
 
         self.frame.Bind(wx.EVT_MENU, self.OnAutoAlign, id = idAutoAlign)
+
+        self.frame.Bind(wx.EVT_MENU, self.OnAbout, id = wx.ID_ABOUT)
 
         self.frame.hyperlink_1.Bind(wx.EVT_HYPERLINK, self.OnHypeLink1)
         self.frame.hyperlink_2.Bind(wx.EVT_HYPERLINK, self.OnHypeLink2)
@@ -367,6 +407,28 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
         self.frame.pnlCanvas.Refresh(False)
+
+    def OnAbout(self, evt = None):
+        # First we create and fill the info object
+        info = wx.AboutDialogInfo()
+        info.Name = appInfo.title
+        info.Version = appInfo.version
+        info.Copyright = appInfo.copyright
+        info.Description = wordwrap(
+            '                              ...'
+            '                               \n'
+            '                              ...'
+            '                               \n'
+            '                              ...'
+            '                                 ',
+            335, wx.ClientDC(self.frame))
+        #info.WebSite = (appInfo.url, "Home Page")
+        info.Developers = [ appInfo.author ]
+        info.License = wordwrap(appInfo.copyright, 500, wx.ClientDC(self.frame))
+
+#        info.Icon = icon32.geticon32Icon()
+
+        wx.AboutBox(info)
 
     def OnExitApp(self, evt = None):
         self.timer.Stop()

@@ -79,6 +79,12 @@ class MyApp(wx.App):
         menuZoom.AppendRadioItem(idZoom16, "10%" )
         menuBar.Append(menuZoom, "&Zoom")
 
+        # 3th menu
+        menuFunc = wx.Menu()
+        idAutoAlign = wx.NewId()
+        menuFunc.AppendCheckItem(idAutoAlign, "AutoAlign")
+        menuBar.Append(menuFunc, "&Func")
+
         self.frame.SetMenuBar(menuBar)
 
         # and a file history
@@ -86,8 +92,10 @@ class MyApp(wx.App):
         self.filehistory.UseMenu(menu)
 
         menuBar.Check(idZoom7, True)
+        menuBar.Check(idAutoAlign, True)
 
-        self.zoom = 1
+        self.zoom = 1.0
+        self.autoAlign = True
         self.arrow = None
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
@@ -95,9 +103,7 @@ class MyApp(wx.App):
 
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
-        self.frame.Bind(
-            wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9
-            )
+        self.frame.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
 
         self.frame.Bind(wx.EVT_MENU, self.OnZoom1, id = idZoom1)
@@ -117,6 +123,7 @@ class MyApp(wx.App):
         self.frame.Bind(wx.EVT_MENU, self.OnZoom15, id = idZoom15)
         self.frame.Bind(wx.EVT_MENU, self.OnZoom16, id = idZoom16)
 
+        self.frame.Bind(wx.EVT_MENU, self.OnAutoAlign, id = idAutoAlign)
 
         self.frame.hyperlink_1.Bind(wx.EVT_HYPERLINK, self.OnHypeLink1)
         self.frame.hyperlink_2.Bind(wx.EVT_HYPERLINK, self.OnHypeLink2)
@@ -153,6 +160,12 @@ class MyApp(wx.App):
 
         return True
 
+    def OnAutoAlign(self, evt = None):
+        if evt.Selection == 1:
+            self.autoAlign = True
+        elif evt.Selection == 0:
+            self.autoAlign = False
+
     def OnHypeLink1(self, evt):
         self.movingT = 1
 
@@ -176,7 +189,6 @@ class MyApp(wx.App):
 
     def OnHypeLink8(self, evt):
         self.movingT = 8
-
 
     def OnTimer(self, evt):
         pos = wx.GetMousePosition()
@@ -214,21 +226,22 @@ class MyApp(wx.App):
                             self.frame.lblMeasure12.SetLabel(str12)
                             self.frame.lblMeasure13.SetLabel(str13)
 
-                        if 0 < idx:
-                            distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WAVEFORM_X_MARGIN
-                            distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
-                            if distanceToBefore < distanceToAfter:
-                                if distanceToBefore < 20:
-                                    #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
-                                    self.movingT_x = pos.x - distanceToBefore
+                        if self.autoAlign:
+                            if 0 < idx:
+                                distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WAVEFORM_X_MARGIN
+                                distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
+                                if distanceToBefore < distanceToAfter:
+                                    if distanceToBefore < 20:
+                                        #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
+                                        self.movingT_x = pos.x - distanceToBefore
+                                else:
+                                    if distanceToAfter < 20:
+                                        #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
+                                        self.movingT_x = pos.x + distanceToAfter
                             else:
+                                distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
                                 if distanceToAfter < 20:
-                                    #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
-                                    self.movingT_x = pos.x + distanceToAfter
-                        else:
-                            distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
-                            if distanceToAfter < 20:
-                                    self.movingT_x = pos.x + distanceToAfter
+                                        self.movingT_x = pos.x + distanceToAfter
 
     def SearchIndex(self, px, py):
         l_x = [p[0] for p in self.waveform[1][py]]

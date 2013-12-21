@@ -2,25 +2,19 @@
 
 import sys,os
 import wx
-# from wx import xrc
-# import OpenGLMdl as glmdl
 import layout
 import re
-# from operator import add
-# from functools import partial
 from bisect import bisect_left
 
-"""
-
-"""
 WAVEFORM_X_MARGIN = 5
 WAVEFORM_H = 12
 WAVEFORM_H_OFFSET = 16
 
-def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for hi
-    hi = hi if hi is not None else len(a) # hi defaults to len(a)
-    pos = bisect_left(a,x,lo,hi)          # find insertion position
-    return (pos if pos != hi and a[pos] == x else -1) # don't walk off the end
+#def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for hi
+#    hi = hi if hi is not None else len(a) # hi defaults to len(a)
+#    pos = bisect_left(a,x,lo,hi)          # find insertion position
+#    return (pos if pos != hi and a[pos] == x else -1) # don't walk off the end
+
 #---------------------------------------------------------------------------
 
 class MyApp(wx.App):
@@ -93,7 +87,7 @@ class MyApp(wx.App):
         menuBar.Check(idZoom7, True)
         menuBar.Check(idAutoAlign, True)
 
-        self.zoom = 1.0
+        self.zoomFactor = 1.0
         self.autoAlign = True
         self.arrow = None
         self.timer = wx.Timer(self)
@@ -149,18 +143,6 @@ class MyApp(wx.App):
         self.waveform = []
         self.movingT = None
         self.movingT_x = 0
-
-############################################
-#         file = open('.\\dummy.txt', 'rU')
-#         lstData = file.readlines()
-#         file.close()
-#         self.waveform = Parser(lstData)
-#         self.frame.pnlCanvas.SetMinSize((self.waveform[0][0], 32 * WAVEFORM_H_OFFSET))
-
-#         self.frame.label1.SetLabel('')
-
-#         self.OnExitApp()
-############################################
 
         return True
 
@@ -254,7 +236,6 @@ class MyApp(wx.App):
 
     def OnPaint(self, evt = None):
         dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
-
         dc.Clear()
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
@@ -313,12 +294,9 @@ class MyApp(wx.App):
 
     def Zoom(self, factor):
         self.arrow = None
-        self.waveform = [self.originWave[0]*factor,[[(p[0]*factor, p[1]) for p in line] for line in self.originWave[1]]]
-        self.frame.pnlCanvas.SetSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
-        self.frame.pnlCanvas.SetMinSize((self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET))
-        self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
-        self.frame.pnlCanvas.Refresh(False)
-
+        self.zoomFactor = factor
+        if 0 < len(self.waveform):
+            self.ZoomWaveform()
 
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
@@ -339,7 +317,6 @@ class MyApp(wx.App):
     def Cleanup(self, *args):
         # A little extra cleanup is required for the FileHistory control
         del self.filehistory
-#        self.menu.Destroy()
 
     def OnOpenFile(self, evt):
         dlg = wx.FileDialog(self.frame,
@@ -381,11 +358,15 @@ class MyApp(wx.App):
 
         self.frame.pnlCanvas.Refresh()      # clear the canvas
         self.originWave = Parser(lstData)
-        self.waveform = list(self.originWave)
+        self.ZoomWaveform()
+
+    def ZoomWaveform(self):
+        self.waveform = [self.originWave[0]*self.zoomFactor,[[(p[0]*self.zoomFactor, p[1]) for p in line] for line in self.originWave[1]]]
         self.canvasFullSize = wx.Size(self.waveform[0] + 2 * WAVEFORM_X_MARGIN, 32 * WAVEFORM_H_OFFSET)
         self.frame.pnlCanvas.SetSize(self.canvasFullSize)
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
+        self.frame.pnlCanvas.Refresh(False)
 
     def OnExitApp(self, evt = None):
         self.timer.Stop()

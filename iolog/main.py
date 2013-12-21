@@ -216,19 +216,20 @@ class MyApp(wx.App):
                 if line < len(self.waveform[1]):
                     idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN, line)
                     if idx < len(self.waveform[1][line]):
-                        arrowNew = [0,0,0,0]
-                        arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
-                        arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
-                        arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
-                        if self.arrow != arrowNew:
-                            self.arrow = arrowNew[:]
-                            self.frame.pnlCanvas.Refresh(False)
-                            str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
-                            str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
-                            str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
-                            self.frame.lblMeasure11.SetLabel(str11)
-                            self.frame.lblMeasure12.SetLabel(str12)
-                            self.frame.lblMeasure13.SetLabel(str13)
+                        if 0 < idx:
+                            arrowNew = [0,0,0,0]
+                            arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
+                            arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
+                            arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
+                            if self.arrow != arrowNew:
+                                self.arrow = arrowNew[:]
+                                self.frame.pnlCanvas.Refresh(False)
+                                str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
+                                str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
+                                str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
+                                self.frame.lblMeasure11.SetLabel(str11)
+                                self.frame.lblMeasure12.SetLabel(str12)
+                                self.frame.lblMeasure13.SetLabel(str13)
 
                         if self.autoAlign:
                             if 0 < idx:

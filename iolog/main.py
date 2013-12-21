@@ -331,7 +331,7 @@ class MyApp(wx.App):
 
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
-            print "You selected %s\n" % path,
+#            print "You selected %s\n" % path,
 
             # add it to the history
             self.filehistory.AddFileToHistory(path)
@@ -345,7 +345,7 @@ class MyApp(wx.App):
         # get the file based on the menu ID
         fileNum = evt.GetId() - wx.ID_FILE1
         path = self.filehistory.GetHistoryFile(fileNum)
-        print "You selected %s\n" % path,
+#        print "You selected %s\n" % path,
 
         self.ReadFile(path)
 
@@ -393,7 +393,7 @@ def Parser(lines):
         matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
         matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
         matrix = [[line[0],] + [p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
-        print matrix
+#        print matrix
         return (int(list[-1][0], 16) - int(list[0][0], 16), matrix)
     return
 

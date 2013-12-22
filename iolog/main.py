@@ -136,6 +136,7 @@ class MyApp(wx.App):
         self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
 
         self.frame.pnlCanvas.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
+        self.frame.pnlCanvas.Bind(wx.EVT_RIGHT_UP, self.OnMouseRightUp)
 
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
@@ -171,6 +172,16 @@ class MyApp(wx.App):
         self.frame.hyperlink_6.Bind(wx.EVT_HYPERLINK, self.OnHypeLink6)
         self.frame.hyperlink_7.Bind(wx.EVT_HYPERLINK, self.OnHypeLink7)
         self.frame.hyperlink_8.Bind(wx.EVT_HYPERLINK, self.OnHypeLink8)
+
+        #don't make them change colors after you click them
+        self.frame.hyperlink_1.VisitedColour = self.frame.hyperlink_1.NormalColour
+        self.frame.hyperlink_2.VisitedColour = self.frame.hyperlink_2.NormalColour
+        self.frame.hyperlink_3.VisitedColour = self.frame.hyperlink_3.NormalColour
+        self.frame.hyperlink_4.VisitedColour = self.frame.hyperlink_4.NormalColour
+        self.frame.hyperlink_5.VisitedColour = self.frame.hyperlink_5.NormalColour
+        self.frame.hyperlink_6.VisitedColour = self.frame.hyperlink_6.NormalColour
+        self.frame.hyperlink_7.VisitedColour = self.frame.hyperlink_7.NormalColour
+        self.frame.hyperlink_8.VisitedColour = self.frame.hyperlink_8.NormalColour
 
 #        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
 
@@ -229,9 +240,13 @@ class MyApp(wx.App):
 
     def OnMouseLeftUp(self, evt):
         if self.movingT is not None:
-            self.MeasureT_x[self.movingT] = [self.movingT_x, self.movingT_x / self.zoomFactor]
-            strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
-            eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
+            self.MeasureT_x[self.movingT] = [self.movingT_x, self.movingT_x / self.zoomFactor - WAVEFORM_X_MARGIN]
+            self.movingT = None
+
+    def OnMouseRightUp(self, evt):
+        if self.movingT is not None:
+            self.MeasureT_x[self.movingT] = [None, None]
+            eval("self.frame.label_T%d.SetLabel('')" % (self.movingT + 1))
             self.movingT = None
 
     def OnTimer(self, evt):
@@ -292,6 +307,27 @@ class MyApp(wx.App):
                     self.MeasureT_x[self.movingT][1] = self.movingT_x - WAVEFORM_X_MARGIN
                     strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
                     eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
+                    if 0 < self.movingT < 7:
+                        x_before = self.MeasureT_x[self.movingT - 1][1]
+                        x_current = self.MeasureT_x[self.movingT][1]
+                        x_after = self.MeasureT_x[self.movingT + 1][1]
+                        if x_current is not None:
+                            if x_before is not None:
+                                strLabel = '%dms' % abs(x_current - x_before)
+                                eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
+                            if x_after is not None:
+                                strLabel = '%dms' % abs(x_current - x_after)
+                                eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT + 1, self.movingT + 2))
+                    elif self.movingT == 0:
+                        x_after = self.MeasureT_x[self.movingT + 1][1]
+                        if x_after is not None:
+                            strLabel = '%dms' % abs(x_current - x_after)
+                            eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT + 1, self.movingT + 2))
+                    elif self.movingT == 7:
+                        x_before = self.MeasureT_x[self.movingT - 1][1]
+                        if x_before is not None:
+                            strLabel = '%dms' % abs(x_current - x_before)
+                            eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
 
                 self.frame.pnlCanvas.Refresh(False)
 

@@ -71,22 +71,8 @@ class MyApp(wx.App):
 
         # 2nd menu
         menuZoom = wx.Menu()
-        idZoom1 = wx.NewId()
-        idZoom2 = wx.NewId()
-        idZoom3 = wx.NewId()
-        idZoom4 = wx.NewId()
-        idZoom5 = wx.NewId()
-        idZoom6 = wx.NewId()
-        idZoom7 = wx.NewId()
-        idZoom8 = wx.NewId()
-        idZoom9 = wx.NewId()
-        idZoom10 = wx.NewId()
-        idZoom11 = wx.NewId()
-        idZoom12 = wx.NewId()
-        idZoom13 = wx.NewId()
-        idZoom14 = wx.NewId()
-        idZoom15 = wx.NewId()
-        idZoom16 = wx.NewId()
+        for i in range(1, 17):
+            exec('idZoom%d = wx.NewId()' % i)
         menuZoom.AppendRadioItem(idZoom1, "500%" )
         menuZoom.AppendRadioItem(idZoom2, "400%" )
         menuZoom.AppendRadioItem(idZoom3, "300%" )
@@ -143,45 +129,20 @@ class MyApp(wx.App):
         self.frame.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
 
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom1, id = idZoom1)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom2, id = idZoom2)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom3, id = idZoom3)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom4, id = idZoom4)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom5, id = idZoom5)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom6, id = idZoom6)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom7, id = idZoom7)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom8, id = idZoom8)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom9, id = idZoom9)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom10, id = idZoom10)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom11, id = idZoom11)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom12, id = idZoom12)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom13, id = idZoom13)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom14, id = idZoom14)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom15, id = idZoom15)
-        self.frame.Bind(wx.EVT_MENU, self.OnZoom16, id = idZoom16)
+        for i in range(1, 17):
+            eval('self.frame.Bind(wx.EVT_MENU, self.OnZoom%d, id = idZoom%d)' % (i, i))
 
         self.frame.Bind(wx.EVT_MENU, self.OnAutoAlign, id = idAutoAlign)
 
         self.frame.Bind(wx.EVT_MENU, self.OnAbout, id = wx.ID_ABOUT)
 
-        self.frame.hyperlink_1.Bind(wx.EVT_HYPERLINK, self.OnHypeLink1)
-        self.frame.hyperlink_2.Bind(wx.EVT_HYPERLINK, self.OnHypeLink2)
-        self.frame.hyperlink_3.Bind(wx.EVT_HYPERLINK, self.OnHypeLink3)
-        self.frame.hyperlink_4.Bind(wx.EVT_HYPERLINK, self.OnHypeLink4)
-        self.frame.hyperlink_5.Bind(wx.EVT_HYPERLINK, self.OnHypeLink5)
-        self.frame.hyperlink_6.Bind(wx.EVT_HYPERLINK, self.OnHypeLink6)
-        self.frame.hyperlink_7.Bind(wx.EVT_HYPERLINK, self.OnHypeLink7)
-        self.frame.hyperlink_8.Bind(wx.EVT_HYPERLINK, self.OnHypeLink8)
+        for i in range(1, 9):
+            eval('self.frame.hyperlink_%d.Bind(wx.EVT_HYPERLINK, self.OnHypeLink%d)' % (i, i))
+            exec('self.frame.hyperlink_%d.VisitedColour = self.frame.hyperlink_%d.NormalColour' % (i, i))
+            eval("self.frame.label_T%d.SetLabel('')" % i)
 
-        #don't make them change colors after you click them
-        self.frame.hyperlink_1.VisitedColour = self.frame.hyperlink_1.NormalColour
-        self.frame.hyperlink_2.VisitedColour = self.frame.hyperlink_2.NormalColour
-        self.frame.hyperlink_3.VisitedColour = self.frame.hyperlink_3.NormalColour
-        self.frame.hyperlink_4.VisitedColour = self.frame.hyperlink_4.NormalColour
-        self.frame.hyperlink_5.VisitedColour = self.frame.hyperlink_5.NormalColour
-        self.frame.hyperlink_6.VisitedColour = self.frame.hyperlink_6.NormalColour
-        self.frame.hyperlink_7.VisitedColour = self.frame.hyperlink_7.NormalColour
-        self.frame.hyperlink_8.VisitedColour = self.frame.hyperlink_8.NormalColour
+        for i in range(1, 8):
+            eval("self.frame.label_sub%d%d.SetLabel('')" % (i, i + 1))
 
 #        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
 
@@ -307,9 +268,9 @@ class MyApp(wx.App):
                     self.MeasureT_x[self.movingT][1] = self.movingT_x - WAVEFORM_X_MARGIN
                     strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
                     eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
+                    x_current = self.MeasureT_x[self.movingT][1]
                     if 0 < self.movingT < 7:
                         x_before = self.MeasureT_x[self.movingT - 1][1]
-                        x_current = self.MeasureT_x[self.movingT][1]
                         x_after = self.MeasureT_x[self.movingT + 1][1]
                         if x_current is not None:
                             if x_before is not None:
@@ -361,6 +322,7 @@ class MyApp(wx.App):
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
 
     def DrawMeasureLine(self, dc, x):
+        dc.SetPen(wx.Pen(wx.RED, 1, style=wx.DOT))
         dc.DrawLine(x, 0, x, self.canvasFullSize.GetHeight())
 
     def OnZoom1(self, evt):

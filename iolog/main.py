@@ -127,7 +127,6 @@ class MyApp(wx.App):
 
         self.zoomFactor = 1.0
         self.autoAlign = True
-        self.arrow = None
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(10)    # ms
@@ -135,6 +134,8 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
         self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)
         self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
+
+        self.frame.pnlCanvas.Bind(wx.EVT_LEFT_UP, self.OnMouseLeftUp)
 
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
@@ -177,12 +178,17 @@ class MyApp(wx.App):
         self.frame.Show()
 
         self.canvasSize = wx.Size()
-        self.canvasFullSize = wx.Size()
+        self.canvasFullSize = wx.Size(0, 32 * WAVEFORM_H_OFFSET)
         self.mousePosOld = None
         self.originWave = []
         self.waveform = []
+        self.arrow = None
+
         self.movingT = None
         self.movingT_x = 0
+
+        self.MeasureT_x = [[None, None], [None, None], [None, None], [None, None],
+                          [None, None], [None, None], [None, None], [None, None]]
 
         return True
 
@@ -193,28 +199,40 @@ class MyApp(wx.App):
             self.autoAlign = False
 
     def OnHypeLink1(self, evt):
-        self.movingT = 1
+        self.SelectT(0)
 
     def OnHypeLink2(self, evt):
-        self.movingT = 2
+        self.SelectT(1)
 
     def OnHypeLink3(self, evt):
-        self.movingT = 3
+        self.SelectT(2)
 
     def OnHypeLink4(self, evt):
-        self.movingT = 4
+        self.SelectT(3)
 
     def OnHypeLink5(self, evt):
-        self.movingT = 5
+        self.SelectT(4)
 
     def OnHypeLink6(self, evt):
-        self.movingT = 6
+        self.SelectT(5)
 
     def OnHypeLink7(self, evt):
-        self.movingT = 7
+        self.SelectT(6)
 
     def OnHypeLink8(self, evt):
-        self.movingT = 8
+        self.SelectT(7)
+
+    def SelectT(self, idx):
+        self.movingT = idx
+        self.MeasureT_x[self.movingT][0] = None
+        self.frame.pnlCanvas.Refresh(False)
+
+    def OnMouseLeftUp(self, evt):
+        if self.movingT is not None:
+            self.MeasureT_x[self.movingT] = [self.movingT_x, self.movingT_x / self.zoomFactor]
+            strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
+            eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
+            self.movingT = None
 
     def OnTimer(self, evt):
         pos = wx.GetMousePosition()
@@ -225,50 +243,57 @@ class MyApp(wx.App):
         self.canvasSize = rect.GetSize()
         pos = self.frame.ScreenToClient(pos)
         if rect.Contains(pos):
-            (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
-            (pos.x, pos.y) = (pos.x - rect.x, pos.y)
             if self.mousePosOld != pos:
                 self.mousePosOld = pos
+
+                (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
+                (pos.x, pos.y) = (pos.x - rect.x, pos.y)
                 self.movingT_x = pos.x
-                self.frame.pnlCanvas.Refresh(False)
 
-            if 0 < len(self.waveform):
-                line = pos.y / WAVEFORM_H_OFFSET
+                if 0 < len(self.waveform):
+                    line = pos.y / WAVEFORM_H_OFFSET
 
-                if line < len(self.waveform[1]):
-                    idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN, line)
-                    if idx < len(self.waveform[1][line]):
-                        if 0 < idx:
-                            arrowNew = [0,0,0,0]
-                            arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
-                            arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
-                            arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
-                            if self.arrow != arrowNew:
-                                self.arrow = arrowNew[:]
-                                self.frame.pnlCanvas.Refresh(False)
-                                str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
-                                str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
-                                str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
-                                self.frame.lblMeasure11.SetLabel(str11)
-                                self.frame.lblMeasure12.SetLabel(str12)
-                                self.frame.lblMeasure13.SetLabel(str13)
-
-                        if self.autoAlign:
+                    if line < len(self.waveform[1]):
+                        idx = self.SearchIndex(pos.x - WAVEFORM_X_MARGIN, line)
+                        if idx < len(self.waveform[1][line]):
                             if 0 < idx:
-                                distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WAVEFORM_X_MARGIN
-                                distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
-                                if distanceToBefore < distanceToAfter:
-                                    if distanceToBefore < 30:
-                                        #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
-                                        self.movingT_x = pos.x - distanceToBefore
+                                arrowNew = [0,0,0,0]
+                                arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WAVEFORM_X_MARGIN
+                                arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WAVEFORM_X_MARGIN
+                                arrowNew[1] = arrowNew[3] = line * WAVEFORM_H_OFFSET + WAVEFORM_H / 2
+                                if self.arrow != arrowNew:
+                                    self.arrow = arrowNew[:]
+                                    self.frame.pnlCanvas.Refresh(False)
+                                    str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
+                                    str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
+                                    str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
+                                    self.frame.lblMeasure11.SetLabel(str11)
+                                    self.frame.lblMeasure12.SetLabel(str12)
+                                    self.frame.lblMeasure13.SetLabel(str13)
+
+                            if self.autoAlign:
+                                if 0 < idx:
+                                    distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WAVEFORM_X_MARGIN
+                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
+                                    if distanceToBefore < distanceToAfter:
+                                        if distanceToBefore < 30:
+                                            #self.movingT_x = self.waveform[1][line][idx-1][0] + WAVEFORM_X_MARGIN
+                                            self.movingT_x = pos.x - distanceToBefore
+                                    else:
+                                        if distanceToAfter < 30:
+                                            #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
+                                            self.movingT_x = pos.x + distanceToAfter
                                 else:
-                                    if distanceToAfter < 30:
-                                        #self.movingT_x = self.waveform[1][line][idx][0] + WAVEFORM_X_MARGIN
+                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
+                                    if distanceToAfter < 20:
                                         self.movingT_x = pos.x + distanceToAfter
-                            else:
-                                distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WAVEFORM_X_MARGIN
-                                if distanceToAfter < 20:
-                                        self.movingT_x = pos.x + distanceToAfter
+
+                if self.movingT is not None:
+                    self.MeasureT_x[self.movingT][1] = self.movingT_x - WAVEFORM_X_MARGIN
+                    strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
+                    eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
+
+                self.frame.pnlCanvas.Refresh(False)
 
     def SearchIndex(self, px, py):
         l_x = [p[0] for p in self.waveform[1][py]]
@@ -285,6 +310,9 @@ class MyApp(wx.App):
                 self.DrawArrow(dc, self.arrow)
         if self.movingT is not None:
             self.DrawMeasureLine(dc, self.movingT_x)
+        for x in self.MeasureT_x:
+            if x[0] is not None:
+                self.DrawMeasureLine(dc, x[0])
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):

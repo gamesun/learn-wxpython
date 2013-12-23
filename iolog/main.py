@@ -208,6 +208,13 @@ class MyApp(wx.App):
         if self.movingT is not None:
             self.MeasureT_x[self.movingT] = [None, None]
             eval("self.frame.label_T%d.SetLabel('')" % (self.movingT + 1))
+            if 0 < self.movingT < 7:
+                eval("self.frame.label_sub%d%d.SetLabel('')" % (self.movingT, self.movingT + 1))
+                eval("self.frame.label_sub%d%d.SetLabel('')" % (self.movingT + 1, self.movingT + 2))
+            elif self.movingT == 0:
+                eval("self.frame.label_sub%d%d.SetLabel('')" % (self.movingT + 1, self.movingT + 2))
+            elif self.movingT == 7:
+                eval("self.frame.label_sub%d%d.SetLabel('')" % (self.movingT, self.movingT + 1))
             self.movingT = None
 
     def OnTimer(self, evt):

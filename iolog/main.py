@@ -41,7 +41,7 @@ from bisect import bisect_left
 
 # waveform parameters
 WF_X_MARGIN = 5
-WF_Y_MARGIN = 10
+WF_Y_MARGIN = 8
 WF_H = 12
 WF_H_OFFSET = 16
 
@@ -56,8 +56,8 @@ class MyApp(wx.App):
     def OnInit(self):
         self.frame = layout.myFrame(None, wx.ID_ANY, "")
 
-        self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET)
-        self.frame.wdCanvas.SetScrollRate(10, WF_H_OFFSET)
+        self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET / 2)
+        self.frame.wdCanvas.SetScrollRate(10, WF_H_OFFSET / 2)
 
         # Make a menu
         menuBar = wx.MenuBar()
@@ -145,8 +145,6 @@ class MyApp(wx.App):
 
         for i in range(1, 8):
             eval("self.frame.label_sub%d%d.SetLabel('')" % (i, i + 1))
-
-#        self.frame.Center(wx.HORIZONTAL | wx.VERTICAL)
 
         self.SetTopWindow(self.frame)
         self.frame.Show()

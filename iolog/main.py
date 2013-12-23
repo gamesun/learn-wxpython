@@ -59,6 +59,18 @@ class MyApp(wx.App):
         self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET / 2)
         self.frame.wdCanvas.SetScrollRate(10, WF_H_OFFSET / 2)
 
+        colorDatabase = wx.ColourDatabase()
+        self.Tcolor = [
+          colorDatabase.Find('GREY'),
+          colorDatabase.Find('ORANGE RED'),
+          colorDatabase.Find('CORAL'),
+          colorDatabase.Find('TURQUOISE'),
+          colorDatabase.Find('SPRING GREEN'),
+          colorDatabase.Find('SKY BLUE'),
+          colorDatabase.Find('TAN'),
+          colorDatabase.Find('CYAN'),
+        ]
+
         # Make a menu
         menuBar = wx.MenuBar()
 
@@ -140,7 +152,7 @@ class MyApp(wx.App):
 
         for i in range(1, 9):
             eval('self.frame.hyperlink_%d.Bind(wx.EVT_HYPERLINK, self.OnHypeLink%d)' % (i, i))
-            exec('self.frame.hyperlink_%d.VisitedColour = self.frame.hyperlink_%d.NormalColour' % (i, i))
+            exec('self.frame.hyperlink_%d.VisitedColour = self.frame.hyperlink_%d.NormalColour = self.Tcolor[i-1]' % (i, i))
             eval("self.frame.label_T%d.SetLabel('')" % i)
 
         for i in range(1, 8):
@@ -201,7 +213,7 @@ class MyApp(wx.App):
 
     def OnMouseLeftUp(self, evt):
         if self.movingT is not None:
-            self.MeasureT_x[self.movingT] = [self.movingT_x, self.movingT_x / self.zoomFactor - WF_X_MARGIN]
+            self.MeasureT_x[self.movingT] = [self.movingT_x, (self.movingT_x - WF_X_MARGIN) / self.zoomFactor]
             self.movingT = None
 
     def OnMouseRightUp(self, evt):
@@ -272,7 +284,7 @@ class MyApp(wx.App):
                                         self.movingT_x = pos.x + distanceToAfter
 
                 if self.movingT is not None:
-                    self.MeasureT_x[self.movingT][1] = self.movingT_x - WF_X_MARGIN
+                    self.MeasureT_x[self.movingT][1] = (self.movingT_x - WF_X_MARGIN) / self.zoomFactor
                     strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
                     eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
                     x_current = self.MeasureT_x[self.movingT][1]
@@ -306,6 +318,9 @@ class MyApp(wx.App):
     def OnPaint(self, evt = None):
         dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
         dc.Clear()
+        for i, x in enumerate(self.MeasureT_x):
+            if x[0] is not None:
+                self.DrawMeasureLine(dc, x[0], i)
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
@@ -313,10 +328,7 @@ class MyApp(wx.App):
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
         if self.movingT is not None:
-            self.DrawMeasureLine(dc, self.movingT_x)
-        for x in self.MeasureT_x:
-            if x[0] is not None:
-                self.DrawMeasureLine(dc, x[0])
+            self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -328,9 +340,10 @@ class MyApp(wx.App):
         dc.DrawLines([[coord[0]+2,coord[1]-2],[coord[0],coord[1]],[coord[0]+3,coord[1]+3]])
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
 
-    def DrawMeasureLine(self, dc, x):
-        dc.SetPen(wx.Pen(wx.RED, 1, style=wx.DOT))
+    def DrawMeasureLine(self, dc, x, id):
+        dc.SetPen(wx.Pen(self.Tcolor[id], 2, style = wx.SHORT_DASH))
         dc.DrawLine(x, 0, x, self.canvasFullSize.GetHeight())
+        dc.DrawText('%d' % (id + 1), x - 4, self.canvasFullSize.GetHeight() - 4)
 
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )

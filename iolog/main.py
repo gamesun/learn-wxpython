@@ -318,6 +318,7 @@ class MyApp(wx.App):
     def OnPaint(self, evt = None):
         dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
         dc.Clear()
+        dc.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
         for i, x in enumerate(self.MeasureT_x):
             if x[0] is not None:
                 self.DrawMeasureLine(dc, x[0], i)

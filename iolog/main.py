@@ -38,12 +38,16 @@ import wx
 import layout
 import re
 from bisect import bisect_left
+import codecs
 
 # waveform parameters
 WF_X_MARGIN = 5
 WF_Y_MARGIN = 8
 WF_H = 12
 WF_H_OFFSET = 16
+
+
+regex_sig = re.compile('(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
 #def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for hi
 #    hi = hi if hi is not None else len(a) # hi defaults to len(a)
@@ -76,14 +80,24 @@ class MyApp(wx.App):
 
         # 1st menu from left
         menu = wx.Menu()
-        menu.Append(wx.ID_OPEN,    "&Open...")
-        menu.Append(wx.ID_CLOSE,   "&Close")
+        menu.Append(wx.ID_OPEN,    "&Open log", "Open a log file to display.")
+        menu.Append(wx.ID_CLOSE,   "&Close", "Close the log file.")
         menu.AppendSeparator()
         menu.Append(wx.ID_EXIT,    "&Exit", "Exit The Tool")
         menu.Enable(wx.ID_CLOSE, False)
         menuBar.Append(menu, "&File")
 
+        # and a file history
+        self.filehistory = wx.FileHistory()
+        self.filehistory.UseMenu(menu)
+
         # 2nd menu
+        menuSignLabel = wx.Menu()
+        id_openSigFile = wx.NewId()
+        menuSignLabel.Append(id_openSigFile, "&Open Sig", "Load signal labels form a *.sig file.")
+        menuBar.Append(menuSignLabel, "&Signal")
+
+        # 3rd menu
         menuZoom = wx.Menu()
         for i in range(1, 17):
             exec('idZoom%d = wx.NewId()' % i)
@@ -105,22 +119,20 @@ class MyApp(wx.App):
         menuZoom.AppendRadioItem(idZoom16, "10%" )
         menuBar.Append(menuZoom, "&Zoom")
 
-        # 3rd menu
+        # 4th menu
         menuFunc = wx.Menu()
         idAutoAlign = wx.NewId()
-        menuFunc.AppendCheckItem(idAutoAlign, "AutoAlign")
-        menuBar.Append(menuFunc, "&Func")
+        menuFunc.AppendCheckItem(idAutoAlign, "&AutoAlign", "Auto align a measure line to rising edge or falling edge.")
+        menuBar.Append(menuFunc, "Fun&c")
 
-        # 4th menu
+        # 5th menu
         menuHelp = wx.Menu()
-        menuHelp.Append(wx.ID_ABOUT, "About")
+        menuHelp.Append(wx.ID_ABOUT, "&About")
         menuBar.Append(menuHelp, "&Help")
 
         self.frame.SetMenuBar(menuBar)
 
-        # and a file history
-        self.filehistory = wx.FileHistory()
-        self.filehistory.UseMenu(menu)
+
 
         menuBar.Check(idZoom7, True)
         menuBar.Check(idAutoAlign, True)
@@ -131,6 +143,8 @@ class MyApp(wx.App):
         self.Bind(wx.EVT_TIMER, self.OnTimer)
         self.timer.Start(10)    # ms
 
+        self.frame.window_1.Bind(wx.EVT_SPLITTER_DCLICK, self.OnSplitterDClick)
+
         self.frame.pnlCanvas.Bind(wx.EVT_PAINT, self.OnPaint)
         self.frame.wdTitle.Bind(wx.EVT_SCROLLWIN, self.OnTitleScroll)
         self.frame.wdCanvas.Bind(wx.EVT_SCROLLWIN, self.OnCanvasScroll)
@@ -139,6 +153,8 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.Bind(wx.EVT_RIGHT_UP, self.OnMouseRightUp)
 
         self.frame.Bind(wx.EVT_MENU, self.OnOpenFile, id=wx.ID_OPEN)
+        self.frame.Bind(wx.EVT_MENU, self.OnOpenSigFile, id=id_openSigFile)
+
         self.frame.Bind(wx.EVT_MENU, self.OnExitApp, id=wx.ID_EXIT)
         self.frame.Bind(wx.EVT_MENU_RANGE, self.OnFileHistory, id=wx.ID_FILE1, id2=wx.ID_FILE9)
         self.frame.Bind(wx.EVT_WINDOW_DESTROY, self.Cleanup)
@@ -174,7 +190,42 @@ class MyApp(wx.App):
         self.MeasureT_x = [[None, None], [None, None], [None, None], [None, None],
                           [None, None], [None, None], [None, None], [None, None]]
 
+#        self.LoadSigFile(".\sample.sig")
+
         return True
+
+    def OnSplitterDClick(self, evt):
+        evt.Veto()  # disable the feature "unsplit a splitter"
+
+    def OnOpenSigFile(self, evt):
+        dlg = wx.FileDialog(self.frame,
+                           defaultDir = os.getcwd(),
+                           wildcard = "Sig Files|*.sig",
+                           style = wx.OPEN | wx.CHANGE_DIR)
+
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+
+            self.LoadSigFile(path)
+
+        dlg.Destroy()
+
+
+    def LoadSigFile(self, path):
+        file = codecs.open(path, 'r', 'shift-jis')
+
+        lines = file.readlines()
+
+        file.close()
+
+        for line in lines:
+            r = regex_sig.search(line)
+            if r:
+                idx = int(r.group('index'))
+                lbl = '%02d:%s' % (idx - 1, r.group('signalLabel'))
+                idx = 33 - idx
+                if 1 <= idx <= 32:
+                    eval('self.frame.label_%d.SetLabel(lbl)' % idx)
 
     def OnAutoAlign(self, evt = None):
         if evt.Selection == 1:

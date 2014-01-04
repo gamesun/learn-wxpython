@@ -65,14 +65,14 @@ class MyApp(wx.App):
 
         colorDatabase = wx.ColourDatabase()
         self.Tcolor = [
-          colorDatabase.Find('GREY'),
           colorDatabase.Find('ORANGE RED'),
-          colorDatabase.Find('CORAL'),
-          colorDatabase.Find('TURQUOISE'),
-          colorDatabase.Find('SPRING GREEN'),
+          (255, 165, 0),#colorDatabase.Find('ORANGE1'),
           colorDatabase.Find('SKY BLUE'),
-          colorDatabase.Find('TAN'),
-          colorDatabase.Find('CYAN'),
+          colorDatabase.Find('SPRING GREEN'),
+          (191, 62, 255),#colorDatabase.Find('DARKORCHID1'),
+          (255, 106, 106),#colorDatabase.Find('INDIANRED1'),
+          (0, 229, 238),#colorDatabase.Find('TURQUOISE2'),
+          colorDatabase.Find('GREY'),
         ]
 
         # Make a menu

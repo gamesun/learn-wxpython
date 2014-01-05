@@ -167,8 +167,9 @@ class MyApp(wx.App):
         self.frame.Bind(wx.EVT_MENU, self.OnAbout, id = wx.ID_ABOUT)
 
         for i in range(1, 9):
-            eval('self.frame.hyperlink_%d.Bind(wx.EVT_HYPERLINK, self.OnHypeLink%d)' % (i, i))
-            exec('self.frame.hyperlink_%d.VisitedColour = self.frame.hyperlink_%d.NormalColour = self.Tcolor[i-1]' % (i, i))
+            eval('self.frame.lblMeasure_T%d.Bind(wx.EVT_LEFT_DOWN, self.OnClickMeasure_T%d)' % (i, i))
+            exec('self.frame.lblMeasure_T%d.SetForegroundColour(self.Tcolor[i-1])' % i)
+            exec('self.frame.lblMeasure_T%d.SetCursor(wx.StockCursor(wx.CURSOR_HAND))' % i)
             eval("self.frame.label_T%d.SetLabel('')" % i)
 
         for i in range(1, 8):
@@ -233,28 +234,28 @@ class MyApp(wx.App):
         elif evt.Selection == 0:
             self.autoAlign = False
 
-    def OnHypeLink1(self, evt):
+    def OnClickMeasure_T1(self, evt):
         self.SelectT(0)
 
-    def OnHypeLink2(self, evt):
+    def OnClickMeasure_T2(self, evt):
         self.SelectT(1)
 
-    def OnHypeLink3(self, evt):
+    def OnClickMeasure_T3(self, evt):
         self.SelectT(2)
 
-    def OnHypeLink4(self, evt):
+    def OnClickMeasure_T4(self, evt):
         self.SelectT(3)
 
-    def OnHypeLink5(self, evt):
+    def OnClickMeasure_T5(self, evt):
         self.SelectT(4)
 
-    def OnHypeLink6(self, evt):
+    def OnClickMeasure_T6(self, evt):
         self.SelectT(5)
 
-    def OnHypeLink7(self, evt):
+    def OnClickMeasure_T7(self, evt):
         self.SelectT(6)
 
-    def OnHypeLink8(self, evt):
+    def OnClickMeasure_T8(self, evt):
         self.SelectT(7)
 
     def SelectT(self, idx):

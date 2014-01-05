@@ -259,6 +259,8 @@ class MyApp(wx.App):
         self.SelectT(7)
 
     def SelectT(self, idx):
+        if self.movingT is not None:
+            self.OnMouseRightUp()
         self.movingT = idx
         self.MeasureT_x[self.movingT][0] = None
         self.frame.pnlCanvas.Refresh(False)
@@ -268,7 +270,7 @@ class MyApp(wx.App):
             self.MeasureT_x[self.movingT] = [self.movingT_x, (self.movingT_x - WF_X_MARGIN) / self.zoomFactor]
             self.movingT = None
 
-    def OnMouseRightUp(self, evt):
+    def OnMouseRightUp(self, evt = None):
         if self.movingT is not None:
             self.MeasureT_x[self.movingT] = [None, None]
             eval("self.frame.label_T%d.SetLabel('')" % (self.movingT + 1))

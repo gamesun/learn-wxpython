@@ -123,7 +123,8 @@ myOptions = {
         "compressed": 1,
         "optimize": 2,
         "ascii": 1,
-#         "includes":,
+        "includes": ["encodings","encodings.*"],    # include encodings for codecs
+        "packages": ["encodings"],                  #
         "dll_excludes": ["MSVCP90.dll","w9xpopen.exe"],
         "bundle_files": 2
      }

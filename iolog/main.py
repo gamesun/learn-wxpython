@@ -42,10 +42,13 @@ import codecs
 
 # waveform parameters
 WF_LEFT_MARGIN = 5
-WF_TOP_MARGIN = 8
-WF_H = 8
+WF_TOP_MARGIN = 20
+WF_H = 9
 WF_H_OFFSET = 17
-GRID_OFFSET = (WF_H_OFFSET + WF_H) / 2 + 1
+GRID_OFFSET = (WF_H_OFFSET - WF_H) / 2
+
+MEASURE_LINE_TOP = WF_TOP_MARGIN - 8
+MEASURE_LINE_BTM = WF_TOP_MARGIN + 32 * WF_H_OFFSET + 3
 
 regex_sig = re.compile('(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
@@ -372,7 +375,7 @@ class MyApp(wx.App):
     def OnPaint(self, evt = None):
         dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
         dc.Clear()
-        dc.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
+        dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
 
         self.DrawGrid(dc)
         for i, x in enumerate(self.MeasureT_x):
@@ -388,9 +391,9 @@ class MyApp(wx.App):
             self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
 
     def DrawGrid(self, dc):
-        dc.SetPen(wx.Pen((127,127,127), 1))
-        for i in range(34):
-            dc.DrawLine(WF_LEFT_MARGIN, i * WF_H_OFFSET - GRID_OFFSET, self.canvasFullSize.GetWidth(), i * WF_H_OFFSET - GRID_OFFSET)
+        dc.SetPen(wx.Pen((150,150,150), 1))
+        for i in range(33):
+            dc.DrawLine(1, i * WF_H_OFFSET - GRID_OFFSET + WF_TOP_MARGIN, self.canvasFullSize.GetWidth(), i * WF_H_OFFSET - GRID_OFFSET + WF_TOP_MARGIN)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -404,8 +407,9 @@ class MyApp(wx.App):
 
     def DrawMeasureLine(self, dc, x, id):
         dc.SetPen(wx.Pen(self.Tcolor[id], 2, style = wx.SHORT_DASH))
-        dc.DrawLine(x, 0, x, self.canvasFullSize.GetHeight())
-        dc.DrawText('%d' % (id + 1), x - 4, self.canvasFullSize.GetHeight() - 4)
+        dc.DrawText('%d' % (id + 1), x - 3, -1)
+        dc.DrawLine(x, MEASURE_LINE_TOP, x, MEASURE_LINE_BTM)
+        dc.DrawText('%d' % (id + 1), x - 3, MEASURE_LINE_BTM)
 
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )

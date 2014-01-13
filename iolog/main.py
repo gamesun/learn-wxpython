@@ -39,6 +39,7 @@ import layout
 import re
 from bisect import bisect_left
 import codecs
+import ConfigParser
 
 # waveform parameters
 WF_LEFT_MARGIN = 5
@@ -135,8 +136,6 @@ class MyApp(wx.App):
 
         self.frame.SetMenuBar(menuBar)
 
-
-
         menuBar.Check(idZoom7, True)
         menuBar.Check(idAutoAlign, True)
 
@@ -194,9 +193,32 @@ class MyApp(wx.App):
         self.MeasureT_x = [[None, None], [None, None], [None, None], [None, None],
                           [None, None], [None, None], [None, None], [None, None]]
 
+
+        self.sigFilePath = ""
+
+        self.config = ConfigParser.RawConfigParser()
+        self.LoadSettings()
 #        self.LoadSigFile(".\sample.sig")
 
         return True
+
+    def LoadSettings(self):
+        self.config.read('setting.ini')
+        try:
+            if self.config.has_section('sig_file'):
+                self.LoadSigFile(self.config.get('sig_file', 'path'))
+        except:
+            pass
+
+    def SaveSettings(self):
+        print "save"
+        if not self.config.has_section('sig_file'):
+            self.config.add_section('sig_file')
+
+        self.config.set('sig_file', 'path', self.sigFilePath)
+
+        with open('setting.ini', 'w') as configfile:
+            self.config.write(configfile)
 
     def OnSplitterDClick(self, evt):
         evt.Veto()  # disable the feature "unsplit a splitter"
@@ -208,14 +230,13 @@ class MyApp(wx.App):
                            style = wx.OPEN | wx.CHANGE_DIR)
 
         if dlg.ShowModal() == wx.ID_OK:
-            path = dlg.GetPath()
-
-            self.LoadSigFile(path)
+            self.LoadSigFile(dlg.GetPath())
 
         dlg.Destroy()
 
 
     def LoadSigFile(self, path):
+        self.sigFilePath = path
         file = codecs.open(path, 'r', 'shift-jis')
 
         lines = file.readlines()
@@ -467,7 +488,7 @@ class MyApp(wx.App):
         self.frame.wdTitle.Scroll(-1, y)
 
     def Cleanup(self, *args):
-        # A little extra cleanup is required for the FileHistory control
+        self.SaveSettings()
         del self.filehistory
 
     def OnOpenFile(self, evt):

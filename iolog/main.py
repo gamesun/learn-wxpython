@@ -41,8 +41,8 @@ from bisect import bisect_left
 import codecs
 
 # waveform parameters
-WF_X_MARGIN = 5
-WF_Y_MARGIN = 8
+WF_LEFT_MARGIN = 5
+WF_TOP_MARGIN = 8
 WF_H = 8
 WF_H_OFFSET = 17
 GRID_OFFSET = (WF_H_OFFSET + WF_H) / 2 + 1
@@ -179,7 +179,7 @@ class MyApp(wx.App):
         self.frame.Show()
 
         self.canvasSize = wx.Size()
-        self.canvasFullSize = wx.Size(0, 32 * WF_H_OFFSET + WF_Y_MARGIN)
+        self.canvasFullSize = wx.Size(0, 32 * WF_H_OFFSET + WF_TOP_MARGIN)
         self.mousePosOld = None
         self.originWave = []
         self.waveform = []
@@ -267,7 +267,7 @@ class MyApp(wx.App):
 
     def OnMouseLeftUp(self, evt):
         if self.movingT is not None:
-            self.MeasureT_x[self.movingT] = [self.movingT_x, (self.movingT_x - WF_X_MARGIN) / self.zoomFactor]
+            self.MeasureT_x[self.movingT] = [self.movingT_x, (self.movingT_x - WF_LEFT_MARGIN) / self.zoomFactor]
             self.movingT = None
 
     def OnMouseRightUp(self, evt = None):
@@ -300,16 +300,16 @@ class MyApp(wx.App):
                 self.movingT_x = pos.x
 
                 if 0 < len(self.waveform):
-                    line = (pos.y - WF_Y_MARGIN) / WF_H_OFFSET
+                    line = (pos.y - WF_TOP_MARGIN) / WF_H_OFFSET
 
                     if -1 < line < len(self.waveform[1]):
-                        idx = self.SearchIndex(pos.x - WF_X_MARGIN, line)
+                        idx = self.SearchIndex(pos.x - WF_LEFT_MARGIN, line)
                         if idx < len(self.waveform[1][line]):
                             if 0 < idx:
                                 arrowNew = [0,0,0,0]
-                                arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WF_X_MARGIN
-                                arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WF_X_MARGIN
-                                arrowNew[1] = arrowNew[3] = line * WF_H_OFFSET + WF_H / 2 + WF_Y_MARGIN
+                                arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WF_LEFT_MARGIN
+                                arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WF_LEFT_MARGIN
+                                arrowNew[1] = arrowNew[3] = line * WF_H_OFFSET + WF_H / 2 + WF_TOP_MARGIN
                                 if self.arrow != arrowNew:
                                     self.arrow = arrowNew[:]
                                     self.frame.pnlCanvas.Refresh(False)
@@ -322,23 +322,23 @@ class MyApp(wx.App):
 
                             if self.autoAlign:
                                 if 0 < idx:
-                                    distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WF_X_MARGIN
-                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_X_MARGIN
+                                    distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WF_LEFT_MARGIN
+                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_LEFT_MARGIN
                                     if distanceToBefore < distanceToAfter:
                                         if distanceToBefore < 30:
-                                            #self.movingT_x = self.waveform[1][line][idx-1][0] + WF_X_MARGIN
+                                            #self.movingT_x = self.waveform[1][line][idx-1][0] + WF_LEFT_MARGIN
                                             self.movingT_x = pos.x - distanceToBefore
                                     else:
                                         if distanceToAfter < 30:
-                                            #self.movingT_x = self.waveform[1][line][idx][0] + WF_X_MARGIN
+                                            #self.movingT_x = self.waveform[1][line][idx][0] + WF_LEFT_MARGIN
                                             self.movingT_x = pos.x + distanceToAfter
                                 else:
-                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_X_MARGIN
+                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_LEFT_MARGIN
                                     if distanceToAfter < 20:
                                         self.movingT_x = pos.x + distanceToAfter
 
                 if self.movingT is not None:
-                    self.MeasureT_x[self.movingT][1] = (self.movingT_x - WF_X_MARGIN) / self.zoomFactor
+                    self.MeasureT_x[self.movingT][1] = (self.movingT_x - WF_LEFT_MARGIN) / self.zoomFactor
                     strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
                     eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
                     x_current = self.MeasureT_x[self.movingT][1]
@@ -381,7 +381,7 @@ class MyApp(wx.App):
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
                 dc.SetPen(wx.Pen(wx.BLACK, 1))
-                self.DrawWave(dc, w, WF_X_MARGIN, (WF_H_OFFSET * i + WF_Y_MARGIN))
+                self.DrawWave(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
         if self.movingT is not None:
@@ -390,7 +390,7 @@ class MyApp(wx.App):
     def DrawGrid(self, dc):
         dc.SetPen(wx.Pen((127,127,127), 1))
         for i in range(34):
-            dc.DrawLine(WF_X_MARGIN, i * WF_H_OFFSET - GRID_OFFSET, self.canvasFullSize.GetWidth(), i * WF_H_OFFSET - GRID_OFFSET)
+            dc.DrawLine(WF_LEFT_MARGIN, i * WF_H_OFFSET - GRID_OFFSET, self.canvasFullSize.GetWidth(), i * WF_H_OFFSET - GRID_OFFSET)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -510,7 +510,7 @@ class MyApp(wx.App):
 
     def ZoomWaveform(self):
         self.waveform = [self.originWave[0]*self.zoomFactor,[[(p[0]*self.zoomFactor, p[1]) for p in line] for line in self.originWave[1]]]
-        self.canvasFullSize = wx.Size(self.waveform[0] + 2 * WF_X_MARGIN, 32 * WF_H_OFFSET + 2 * WF_Y_MARGIN)
+        self.canvasFullSize = wx.Size(self.waveform[0] + 2 * WF_LEFT_MARGIN, 32 * WF_H_OFFSET + 2 * WF_TOP_MARGIN)
         self.frame.pnlCanvas.SetSize(self.canvasFullSize)
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)

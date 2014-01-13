@@ -43,9 +43,9 @@ import codecs
 # waveform parameters
 WF_X_MARGIN = 5
 WF_Y_MARGIN = 8
-WF_H = 12
-WF_H_OFFSET = 16
-
+WF_H = 8
+WF_H_OFFSET = 17
+GRID_OFFSET = (WF_H_OFFSET + WF_H) / 2 + 1
 
 regex_sig = re.compile('(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
@@ -373,6 +373,8 @@ class MyApp(wx.App):
         dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
         dc.Clear()
         dc.SetFont(wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
+
+        self.DrawGrid(dc)
         for i, x in enumerate(self.MeasureT_x):
             if x[0] is not None:
                 self.DrawMeasureLine(dc, x[0], i)
@@ -384,6 +386,11 @@ class MyApp(wx.App):
                 self.DrawArrow(dc, self.arrow)
         if self.movingT is not None:
             self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
+
+    def DrawGrid(self, dc):
+        dc.SetPen(wx.Pen((127,127,127), 1))
+        for i in range(34):
+            dc.DrawLine(WF_X_MARGIN, i * WF_H_OFFSET - GRID_OFFSET, self.canvasFullSize.GetWidth(), i * WF_H_OFFSET - GRID_OFFSET)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):

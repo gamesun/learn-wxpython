@@ -51,7 +51,7 @@ GRID_OFFSET = (WF_H_OFFSET - WF_H) / 2
 MEASURE_LINE_TOP = WF_TOP_MARGIN - 8
 MEASURE_LINE_BTM = WF_TOP_MARGIN + 32 * WF_H_OFFSET + 3
 
-regex_sig = re.compile('(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
+regex_sig = re.compile('^(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
 #def binary_search(a, x, lo=0, hi=None):   # can't use a to specify default for hi
 #    hi = hi if hi is not None else len(a) # hi defaults to len(a)
@@ -177,6 +177,13 @@ class MyApp(wx.App):
         for i in range(1, 8):
             eval("self.frame.label_sub%d%d.SetLabel('')" % (i, i + 1))
 
+        for i in range(1, 33):
+            label = "%02d:" % (33 - i)
+            eval("self.frame.label_%d.SetLabel(label)" % i)
+            eval("self.frame.label_%d.SetMinSize((-1, %d))" % (i, WF_H_OFFSET))
+        self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN))
+        self.frame.wdTitle.GetSizer().Layout()
+
         self.SetTopWindow(self.frame)
         self.frame.Show()
 
@@ -190,11 +197,10 @@ class MyApp(wx.App):
         self.movingT = None
         self.movingT_x = 0
 
-        self.MeasureT_x = [[None, None], [None, None], [None, None], [None, None],
-                          [None, None], [None, None], [None, None], [None, None]]
-
+        self.MeasureT_x = [[None, None] for i in range(8)]
 
         self.sigFilePath = ""
+        self.signalLabel = ["%02d:" % i for i in range(32)]
 
         self.config = ConfigParser.RawConfigParser()
         self.LoadSettings()
@@ -247,9 +253,10 @@ class MyApp(wx.App):
             r = regex_sig.search(line)
             if r:
                 idx = int(r.group('index'))
-                lbl = '%02d:%s' % (idx - 1, r.group('signalLabel'))
-                idx = 33 - idx
+                lbl = '%02d:%s' % (idx + 1, r.group('signalLabel'))
+                idx = 32 - idx
                 if 1 <= idx <= 32:
+                    self.signalLabel
                     eval('self.frame.label_%d.SetLabel(lbl)' % idx)
 
     def OnAutoAlign(self, evt = None):

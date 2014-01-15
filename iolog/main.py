@@ -200,7 +200,7 @@ class MyApp(wx.App):
         self.MeasureT_x = [[None, None] for i in range(8)]
 
         self.sigFilePath = ""
-        self.signalLabel = ["%02d:" % i for i in range(32)]
+        self.signalLabel = ["%02d:" % i for i in range(1, 33)][::-1]
 
         self.config = ConfigParser.RawConfigParser()
         self.LoadSettings()
@@ -254,6 +254,7 @@ class MyApp(wx.App):
             if r:
                 idx = int(r.group('index'))
                 lbl = '%02d:%s' % (idx + 1, r.group('signalLabel'))
+                self.signalLabel[31 - idx] = lbl
                 idx = 32 - idx
                 if 1 <= idx <= 32:
                     self.signalLabel
@@ -347,9 +348,11 @@ class MyApp(wx.App):
                                     str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
                                     str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
                                     str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
+                                    str21 = self.signalLabel[line]
                                     self.frame.lblMeasure11.SetLabel(str11)
                                     self.frame.lblMeasure12.SetLabel(str12)
                                     self.frame.lblMeasure13.SetLabel(str13)
+                                    self.frame.lblMeasure21.SetLabel(str21)
 
                             if self.autoAlign:
                                 if 0 < idx:

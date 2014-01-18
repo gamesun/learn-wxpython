@@ -174,6 +174,11 @@ class MyApp(wx.App):
             exec('self.frame.lblMeasure_T%d.SetCursor(wx.StockCursor(wx.CURSOR_HAND))' % i)
             eval("self.frame.label_T%d.SetLabel('')" % i)
 
+        self.frame.label_1.Bind(wx.EVT_ENTER_WINDOW, self.OnLabelMotion)
+
+#        self.ctrl1 = wx.ComboBox(self.frame.wdTitle, wx.ID_ANY, "12345")
+        self.frame.label_2.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveWindow)
+
         for i in range(1, 8):
             eval("self.frame.label_sub%d%d.SetLabel('')" % (i, i + 1))
 
@@ -199,6 +204,8 @@ class MyApp(wx.App):
 
         self.MeasureT_x = [[None, None] for i in range(8)]
 
+
+
         self.sigFilePath = ""
         self.signalLabel = ["%02d:" % i for i in range(1, 33)][::-1]
 
@@ -207,6 +214,23 @@ class MyApp(wx.App):
 #        self.LoadSigFile(".\sample.sig")
 
         return True
+
+    def OnLeaveWindow(self, evt = None):
+        self.frame.sizerSigLabel.Hide(2)
+        self.frame.sizerSigLabel.Show(1)
+        #print self.frame.sizerSigLabel.Replace(self.ctrl1, self.frame.label_1)
+        #print 1
+        #self.frame.sizerSigLabel.Layout()
+        #self.frame.wdTitle.Fit()
+        self.frame.wdTitle.GetSizer().Layout()
+
+    def OnLabelMotion(self, evt = None):
+        self.frame.sizerSigLabel.Hide(1)
+        self.frame.sizerSigLabel.Show(2)
+        #self.frame.sizerSigLabel.Replace(self.frame.label_1, self.ctrl1)
+        #self.frame.sizerSigLabel.Layout()
+        #self.frame.wdTitle.Fit()
+        self.frame.wdTitle.GetSizer().Layout()
 
     def LoadSettings(self):
         self.config.read('setting.ini')
@@ -217,7 +241,6 @@ class MyApp(wx.App):
             pass
 
     def SaveSettings(self):
-        print "save"
         if not self.config.has_section('sig_file'):
             self.config.add_section('sig_file')
 
@@ -345,14 +368,14 @@ class MyApp(wx.App):
                                 if self.arrow != arrowNew:
                                     self.arrow = arrowNew[:]
                                     self.frame.pnlCanvas.Refresh(False)
-                                    str11 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
-                                    str12 = 'T2:      %d' % self.originWave[1][line][idx][0]
-                                    str13 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
-                                    str21 = self.signalLabel[line]
-                                    self.frame.lblMeasure11.SetLabel(str11)
-                                    self.frame.lblMeasure12.SetLabel(str12)
-                                    self.frame.lblMeasure13.SetLabel(str13)
-                                    self.frame.lblMeasure21.SetLabel(str21)
+                                    str1 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
+                                    str2 = 'T2:      %d' % self.originWave[1][line][idx][0]
+                                    str3 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
+                                    str4 = self.signalLabel[line]
+                                    self.frame.lblInfo1.SetLabel(str1)
+                                    self.frame.lblInfo2.SetLabel(str2)
+                                    self.frame.lblInfo3.SetLabel(str3)
+                                    self.frame.lblInfo4.SetLabel(str4)
 
                             if self.autoAlign:
                                 if 0 < idx:

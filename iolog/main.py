@@ -35,7 +35,7 @@ import appInfo
 from wx.lib.wordwrap import wordwrap
 import sys,os
 import wx
-import layout
+import layout2 as layout
 import re
 from bisect import bisect_left
 import codecs
@@ -62,7 +62,7 @@ regex_sig = re.compile('^(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
 class MyApp(wx.App):
     def OnInit(self):
-        self.frame = layout.myFrame(None, wx.ID_ANY, "")
+        self.frame = layout.myFrame(None)
 
         self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET / 2)
         self.frame.wdCanvas.SetScrollRate(10, WF_H_OFFSET / 2)
@@ -189,6 +189,9 @@ class MyApp(wx.App):
         self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN))
         self.frame.wdTitle.GetSizer().Layout()
 
+
+        self.sizerSigLabel = self.frame.wdTitle.GetSizer()
+
         self.SetTopWindow(self.frame)
         self.frame.Show()
 
@@ -216,21 +219,14 @@ class MyApp(wx.App):
         return True
 
     def OnLeaveWindow(self, evt = None):
-        self.frame.sizerSigLabel.Hide(2)
-        self.frame.sizerSigLabel.Show(1)
-        #print self.frame.sizerSigLabel.Replace(self.ctrl1, self.frame.label_1)
-        #print 1
-        #self.frame.sizerSigLabel.Layout()
-        #self.frame.wdTitle.Fit()
-        self.frame.wdTitle.GetSizer().Layout()
+        self.sizerSigLabel.Hide(2)
+        self.sizerSigLabel.Show(1)
+        self.sizerSigLabel.Layout()
 
     def OnLabelMotion(self, evt = None):
-        self.frame.sizerSigLabel.Hide(1)
-        self.frame.sizerSigLabel.Show(2)
-        #self.frame.sizerSigLabel.Replace(self.frame.label_1, self.ctrl1)
-        #self.frame.sizerSigLabel.Layout()
-        #self.frame.wdTitle.Fit()
-        self.frame.wdTitle.GetSizer().Layout()
+        self.sizerSigLabel.Hide(1)
+        self.sizerSigLabel.Show(2)
+        self.sizerSigLabel.Layout()
 
     def LoadSettings(self):
         self.config.read('setting.ini')

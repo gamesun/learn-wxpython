@@ -43,13 +43,13 @@ import ConfigParser
 
 # waveform parameters
 WF_LEFT_MARGIN = 5
-WF_TOP_MARGIN = 20
+WF_TOP_MARGIN = 18
 WF_H = 9
-WF_H_OFFSET = 17
-GRID_OFFSET = (WF_H_OFFSET - WF_H) / 2
+WF_H_OFFSET = 15
+GRID_OFFSET = (WF_H_OFFSET - WF_H) / 2 + 4
 
-MEASURE_LINE_TOP = WF_TOP_MARGIN - 8
-MEASURE_LINE_BTM = WF_TOP_MARGIN + 32 * WF_H_OFFSET + 3
+MEASURE_LINE_TOP = WF_TOP_MARGIN - 6
+MEASURE_LINE_BTM = WF_TOP_MARGIN + 32 * WF_H_OFFSET + 1
 
 regex_sig = re.compile('^(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
@@ -62,6 +62,8 @@ regex_sig = re.compile('^(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
 class MyApp(wx.App):
     def OnInit(self):
+        wx.InitAllImageHandlers()
+
         self.frame = layout.myFrame(None)
 
         self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET / 2)
@@ -174,11 +176,6 @@ class MyApp(wx.App):
             exec('self.frame.lblMeasure_T%d.SetCursor(wx.StockCursor(wx.CURSOR_HAND))' % i)
             eval("self.frame.label_T%d.SetLabel('')" % i)
 
-        self.frame.label_1.Bind(wx.EVT_ENTER_WINDOW, self.OnLabelMotion)
-
-#        self.ctrl1 = wx.ComboBox(self.frame.wdTitle, wx.ID_ANY, "12345")
-        self.frame.label_2.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveWindow)
-
         for i in range(1, 8):
             eval("self.frame.label_sub%d%d.SetLabel('')" % (i, i + 1))
 
@@ -189,6 +186,9 @@ class MyApp(wx.App):
         self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN))
         self.frame.wdTitle.GetSizer().Layout()
 
+
+
+        self.frame.bcombo1.Append("red", wx.Bitmap(r".\res\red.bmp"))
 
         self.sizerSigLabel = self.frame.wdTitle.GetSizer()
 
@@ -207,7 +207,7 @@ class MyApp(wx.App):
 
         self.MeasureT_x = [[None, None] for i in range(8)]
 
-
+        self.mouseEntered1 = False
 
         self.sigFilePath = ""
         self.signalLabel = ["%02d:" % i for i in range(1, 33)][::-1]
@@ -217,16 +217,6 @@ class MyApp(wx.App):
 #        self.LoadSigFile(".\sample.sig")
 
         return True
-
-    def OnLeaveWindow(self, evt = None):
-        self.sizerSigLabel.Hide(2)
-        self.sizerSigLabel.Show(1)
-        self.sizerSigLabel.Layout()
-
-    def OnLabelMotion(self, evt = None):
-        self.sizerSigLabel.Hide(1)
-        self.sizerSigLabel.Show(2)
-        self.sizerSigLabel.Layout()
 
     def LoadSettings(self):
         self.config.read('setting.ini')
@@ -442,8 +432,8 @@ class MyApp(wx.App):
 
     def DrawGrid(self, dc):
         dc.SetPen(wx.Pen((150,150,150), 1))
-        for i in range(33):
-            dc.DrawLine(1, i * WF_H_OFFSET - GRID_OFFSET + WF_TOP_MARGIN, self.canvasFullSize.GetWidth(), i * WF_H_OFFSET - GRID_OFFSET + WF_TOP_MARGIN)
+        for i in range(32):
+            dc.DrawLine(1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN, self.canvasFullSize.GetWidth() - 1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -459,7 +449,7 @@ class MyApp(wx.App):
         dc.SetPen(wx.Pen(self.Tcolor[id], 2, style = wx.SHORT_DASH))
         dc.DrawText('%d' % (id + 1), x - 3, -1)
         dc.DrawLine(x, MEASURE_LINE_TOP, x, MEASURE_LINE_BTM)
-        dc.DrawText('%d' % (id + 1), x - 3, MEASURE_LINE_BTM)
+        dc.DrawText('%d' % (id + 1), x - 3, MEASURE_LINE_BTM - 2)
 
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )
@@ -614,7 +604,8 @@ def Parser(lines):
     list.sort()
 
     if 0 < len(list):
-        matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
+#        matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]
+        matrix = [[(int(l[0], 16), (int(v) + 1) & 1) for v in bits(int(l[1], 16), 32)] for l in list]
         matrix = zip(*matrix)           # zip(*matrix): Transpose the matrix
         matrix = [[line[0],] + [p1 for p0, p1 in zip(line[0:], line[1:]) if p0[1] != p1[1]] + [line[-1],] for line in matrix[::-1]]
 #        print matrix

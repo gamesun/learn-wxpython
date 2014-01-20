@@ -186,10 +186,6 @@ class MyApp(wx.App):
         self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN))
         self.frame.wdTitle.GetSizer().Layout()
 
-
-
-        self.frame.bcombo1.Append("red", wx.Bitmap(r".\res\red.bmp"))
-
         self.sizerSigLabel = self.frame.wdTitle.GetSizer()
 
         self.SetTopWindow(self.frame)
@@ -417,13 +413,15 @@ class MyApp(wx.App):
         dc.Clear()
         dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
 
-        self.DrawGrid(dc)
+        #self.DrawGrid(dc)
+        if 0 < len(self.waveform):
+            for i, w in enumerate(self.waveform[1]):
+                self.DrawRect(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
         for i, x in enumerate(self.MeasureT_x):
             if x[0] is not None:
                 self.DrawMeasureLine(dc, x[0], i)
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
-                dc.SetPen(wx.Pen(wx.BLACK, 1))
                 self.DrawWave(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
@@ -437,8 +435,24 @@ class MyApp(wx.App):
 
     def DrawWave(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
-            dc.DrawLine(c0[0] + x_margin, c0[1] * WF_H + y_offset, c1[0] + x_margin, c0[1] * WF_H + y_offset)
-            dc.DrawLine(c1[0] + x_margin, c0[1] * WF_H + y_offset, c1[0] + x_margin, c1[1] * WF_H + y_offset)
+            x0 = c0[0] + x_margin
+            y0 = c0[1] * WF_H + y_offset
+            x1 = c1[0] + x_margin
+            y1 = c1[1] * WF_H + y_offset
+            dc.SetPen(wx.Pen(wx.BLACK, 1))
+            dc.DrawLine(x0, y0, x1, y0)
+            dc.DrawLine(x1, y0, x1, y1)
+
+    def DrawRect(self, dc, coord, x_margin, y_offset):
+        for c0, c1 in zip(coord[0:], coord[1:]):
+            x0 = c0[0] + x_margin
+            y0 = c0[1] * WF_H + y_offset
+            x1 = c1[0] + x_margin
+            y1 = c1[1] * WF_H + y_offset
+            if c0[1] is 0:
+                dc.SetPen(wx.TRANSPARENT_PEN)
+                dc.SetBrush(wx.Brush((240, 240, 240), wx.SOLID))
+                dc.DrawRectangle(x0 + 1, y0 + 1, x1 - x0 - 1, WF_H - 1)
 
     def DrawArrow(self, dc, coord):
         dc.DrawLine(coord[0], coord[1], coord[2], coord[3])

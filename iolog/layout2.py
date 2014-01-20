@@ -9,7 +9,6 @@
 
 import wx
 import wx.xrc
-import wx.combo
 
 ###########################################################################
 ## Class myFrame
@@ -31,7 +30,7 @@ class myFrame ( wx.Frame ):
 		self.window_1 = wx.SplitterWindow( self.pnlmain, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3DBORDER|wx.SP_BORDER|wx.SP_LIVE_UPDATE )
 		self.window_1.Bind( wx.EVT_IDLE, self.window_1OnIdle )
 		
-		self.wdTitle = wx.ScrolledWindow( self.window_1, wx.ID_ANY, wx.DefaultPosition, wx.Size( 70,-1 ), wx.HSCROLL|wx.VSCROLL )
+		self.wdTitle = wx.ScrolledWindow( self.window_1, wx.ID_ANY, wx.DefaultPosition, wx.Size( 170,-1 ), wx.HSCROLL|wx.VSCROLL )
 		self.wdTitle.SetScrollRate( 5, 5 )
 		bSizer4 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -42,9 +41,6 @@ class myFrame ( wx.Frame ):
 		self.label_1 = wx.StaticText( self.wdTitle, wx.ID_ANY, u"31:", wx.DefaultPosition, wx.Size( -1, 16 ), 0 )
 		self.label_1.Wrap( 0 )
 		bSizer4.Add( self.label_1, 0, wx.EXPAND, 0 )
-		
-		self.bcombo1 = wx.combo.BitmapComboBox( self.wdTitle, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( -1,17 ), "", wx.CB_READONLY ) 
-		bSizer4.Add( self.bcombo1, 0, wx.EXPAND, 5 )
 		
 		self.label_2 = wx.StaticText( self.wdTitle, wx.ID_ANY, u"30:", wx.DefaultPosition, wx.Size( -1, 16 ), 0 )
 		self.label_2.Wrap( 0 )
@@ -192,6 +188,10 @@ class myFrame ( wx.Frame ):
 		
 		self.pnlMeasure = wx.Panel( self.pnlmain, wx.ID_ANY, wx.DefaultPosition, wx.Size( 100,-1 ), wx.TAB_TRAVERSAL )
 		bSizer7 = wx.BoxSizer( wx.VERTICAL )
+		
+		self.lbl0 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"Measurements", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.lbl0.Wrap( -1 )
+		bSizer7.Add( self.lbl0, 0, wx.ALL, 5 )
 		
 		self.lblInfo1 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo1.Wrap( 0 )

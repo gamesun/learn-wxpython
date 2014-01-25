@@ -60,10 +60,54 @@ regex_sig = re.compile('^(?P<index>\d+):(?P<signalLabel>.*)[\r\n]')
 
 #---------------------------------------------------------------------------
 
+class TestTransientPopup(wx.PopupTransientWindow):
+    """Adds a bit of text and mouse movement to the wx.PopupWindow"""
+    def __init__(self, parent, style):
+        wx.PopupTransientWindow.__init__(self, parent, style)
+#        self.log = log
+        panel = wx.Panel(self)
+        panel.SetBackgroundColour("#FFB6C1")
+
+        st = wx.StaticText(panel, -1,
+                          "wx.PopupTransientWindow is a\n"
+                          "wx.PopupWindow which disappears\n"
+                          "automatically when the user\n"
+                          "clicks the mouse outside it or if it\n"
+                          "(or its first child) loses focus in \n"
+                          "any other way.")
+        btn = wx.Button(panel, -1, "Press Me")
+        spin = wx.SpinCtrl(panel, -1, "Hello", size=(100,-1))
+        btn.Bind(wx.EVT_BUTTON, self.OnButton)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(st, 0, wx.ALL, 5)
+        sizer.Add(btn, 0, wx.ALL, 5)
+        sizer.Add(spin, 0, wx.ALL, 5)
+        panel.SetSizer(sizer)
+
+        sizer.Fit(panel)
+        sizer.Fit(self)
+        self.Layout()
+
+
+    def ProcessLeftDown(self, evt):
+#        self.log.write("ProcessLeftDown: %s\n" % evt.GetPosition())
+        return wx.PopupTransientWindow.ProcessLeftDown(self, evt)
+
+    def OnDismiss(self):
+#        self.log.write("OnDismiss\n")
+        pass
+
+    def OnButton(self, evt):
+        btn = evt.GetEventObject()
+        if btn.GetLabel() == "Press Me":
+            btn.SetLabel("Pressed")
+        else:
+            btn.SetLabel("Press Me")
+
+
 class MyApp(wx.App):
     def OnInit(self):
-        wx.InitAllImageHandlers()
-
         self.frame = layout.myFrame(None)
 
         self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET / 2)
@@ -183,8 +227,12 @@ class MyApp(wx.App):
             label = "%02d:" % (33 - i)
             eval("self.frame.label_%d.SetLabel(label)" % i)
             eval("self.frame.label_%d.SetMinSize((-1, %d))" % (i, WF_H_OFFSET))
-        self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN))
+        self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN - 3))
         self.frame.wdTitle.GetSizer().Layout()
+
+        self.frame.label_1.Bind(wx.EVT_LEFT_DOWN, self.OnClickLabel1)
+        self.frame.label_1.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterLabel)
+        self.frame.label_1.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveLabel)
 
         self.sizerSigLabel = self.frame.wdTitle.GetSizer()
 
@@ -213,6 +261,28 @@ class MyApp(wx.App):
 #        self.LoadSigFile(".\sample.sig")
 
         return True
+
+    def OnEnterLabel(self, evt = None):
+        f = self.frame.label_1.GetFont()
+        f.SetUnderlined(True)
+        self.frame.label_1.SetFont(f)
+
+    def OnLeaveLabel(self, evt = None):
+        f = self.frame.label_1.GetFont()
+        f.SetUnderlined(False)
+        self.frame.label_1.SetFont(f)
+
+    def OnClickLabel1(self, evt):
+        win = TestTransientPopup(self.frame, wx.SIMPLE_BORDER)
+
+        # Show the popup right below or above the button
+        # depending on available screen space...
+        btn = evt.GetEventObject()
+        pos = btn.ClientToScreen( (0,0) )
+        sz =  btn.GetSize()
+        win.Position(pos, (0, sz[1]))
+
+        win.Popup()
 
     def LoadSettings(self):
         self.config.read('setting.ini')
@@ -413,7 +483,7 @@ class MyApp(wx.App):
         dc.Clear()
         dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
 
-        #self.DrawGrid(dc)
+        self.DrawGrid(dc)
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
                 self.DrawRect(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
@@ -451,7 +521,7 @@ class MyApp(wx.App):
             y1 = c1[1] * WF_H + y_offset
             if c0[1] is 0:
                 dc.SetPen(wx.TRANSPARENT_PEN)
-                dc.SetBrush(wx.Brush((240, 240, 240), wx.SOLID))
+                dc.SetBrush(wx.Brush((224, 224, 224), wx.SOLID))
                 dc.DrawRectangle(x0 + 1, y0 + 1, x1 - x0 - 1, WF_H - 1)
 
     def DrawArrow(self, dc, coord):

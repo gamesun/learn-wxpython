@@ -30,7 +30,7 @@ class myFrame ( wx.Frame ):
 		self.window_1 = wx.SplitterWindow( self.pnlmain, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.SP_3DBORDER|wx.SP_BORDER|wx.SP_LIVE_UPDATE )
 		self.window_1.Bind( wx.EVT_IDLE, self.window_1OnIdle )
 		
-		self.wdTitle = wx.ScrolledWindow( self.window_1, wx.ID_ANY, wx.DefaultPosition, wx.Size( 170,-1 ), wx.HSCROLL|wx.VSCROLL )
+		self.wdTitle = wx.ScrolledWindow( self.window_1, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.HSCROLL|wx.VSCROLL )
 		self.wdTitle.SetScrollRate( 5, 5 )
 		bSizer4 = wx.BoxSizer( wx.VERTICAL )
 		
@@ -169,6 +169,7 @@ class myFrame ( wx.Frame ):
 		
 		self.wdTitle.SetSizer( bSizer4 )
 		self.wdTitle.Layout()
+		bSizer4.Fit( self.wdTitle )
 		self.wdCanvas = wx.ScrolledWindow( self.window_1, wx.ID_ANY, wx.DefaultPosition, wx.Size( 527, 526 ), wx.SIMPLE_BORDER|wx.HSCROLL|wx.VSCROLL )
 		self.wdCanvas.SetScrollRate( 5, 5 )
 		bSizer5 = wx.BoxSizer( wx.HORIZONTAL )

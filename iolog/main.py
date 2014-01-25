@@ -216,6 +216,8 @@ class MyApp(wx.App):
 
         for i in range(1, 9):
             eval('self.frame.lblMeasure_T%d.Bind(wx.EVT_LEFT_DOWN, self.OnClickMeasure_T%d)' % (i, i))
+            eval('self.frame.lblMeasure_T%d.Bind(wx.EVT_ENTER_WINDOW, lambda evt, self = self: self.OnEnterMeasure_T(evt, %d))' % (i, i))
+            eval('self.frame.lblMeasure_T%d.Bind(wx.EVT_LEAVE_WINDOW, lambda evt, self = self: self.OnLeaveMeasure_T(evt, %d))' % (i, i))
             exec('self.frame.lblMeasure_T%d.SetForegroundColour(self.Tcolor[i-1])' % i)
             exec('self.frame.lblMeasure_T%d.SetCursor(wx.StockCursor(wx.CURSOR_HAND))' % i)
             eval("self.frame.label_T%d.SetLabel('')" % i)
@@ -261,6 +263,18 @@ class MyApp(wx.App):
 #        self.LoadSigFile(".\sample.sig")
 
         return True
+
+    def OnEnterMeasure_T(self, evt, idx):
+        ctrl = evt.GetEventObject()
+        font = ctrl.GetFont()
+        font.SetUnderlined(True)
+        ctrl.SetFont(font)
+
+    def OnLeaveMeasure_T(self, evt, idx):
+        ctrl = evt.GetEventObject()
+        font = ctrl.GetFont()
+        font.SetUnderlined(False)
+        ctrl.SetFont(font)
 
     def OnEnterLabel(self, evt = None):
         f = self.frame.label_1.GetFont()

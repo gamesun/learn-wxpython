@@ -64,46 +64,124 @@ class TestTransientPopup(wx.PopupTransientWindow):
     """Adds a bit of text and mouse movement to the wx.PopupWindow"""
     def __init__(self, parent, style):
         wx.PopupTransientWindow.__init__(self, parent, style)
-#        self.log = log
-        panel = wx.Panel(self)
-        panel.SetBackgroundColour("#FFB6C1")
 
-        st = wx.StaticText(panel, -1,
-                          "wx.PopupTransientWindow is a\n"
-                          "wx.PopupWindow which disappears\n"
-                          "automatically when the user\n"
-                          "clicks the mouse outside it or if it\n"
-                          "(or its first child) loses focus in \n"
-                          "any other way.")
-        btn = wx.Button(panel, -1, "Press Me")
-        spin = wx.SpinCtrl(panel, -1, "Hello", size=(100,-1))
-        btn.Bind(wx.EVT_BUTTON, self.OnButton)
+        self.SetBackgroundColour("#FFFFFF")
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(st, 0, wx.ALL, 5)
-        sizer.Add(btn, 0, wx.ALL, 5)
-        sizer.Add(spin, 0, wx.ALL, 5)
-        panel.SetSizer(sizer)
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
 
-        sizer.Fit(panel)
-        sizer.Fit(self)
+        gSizer1 = wx.GridSizer( 0, 5, 0, 0 )
+
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText1.Wrap( -1 )
+        self.m_staticText1.SetBackgroundColour( wx.Colour( 255, 255, 0 ) )
+        self.m_staticText1.SetToolTipString( u"Yellow" )
+
+        gSizer1.Add( self.m_staticText1, 0, wx.ALL, 2 )
+
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText2.Wrap( -1 )
+        self.m_staticText2.SetBackgroundColour( wx.Colour( 0, 255, 0 ) )
+
+        gSizer1.Add( self.m_staticText2, 0, wx.ALL, 2 )
+
+        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText3.Wrap( -1 )
+        self.m_staticText3.SetBackgroundColour( wx.Colour( 0, 255, 255 ) )
+
+        gSizer1.Add( self.m_staticText3, 0, wx.ALL, 2 )
+
+        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText4.Wrap( -1 )
+        self.m_staticText4.SetBackgroundColour( wx.Colour( 255, 0, 255 ) )
+
+        gSizer1.Add( self.m_staticText4, 0, wx.ALL, 2 )
+
+        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText5.Wrap( -1 )
+        self.m_staticText5.SetBackgroundColour( wx.Colour( 0, 0, 255 ) )
+
+        gSizer1.Add( self.m_staticText5, 0, wx.ALL, 2 )
+
+        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText6.Wrap( -1 )
+        self.m_staticText6.SetBackgroundColour( wx.Colour( 255, 0, 0 ) )
+
+        gSizer1.Add( self.m_staticText6, 0, wx.ALL, 2 )
+
+        self.m_staticText7 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText7.Wrap( -1 )
+        self.m_staticText7.SetBackgroundColour( wx.Colour( 0, 0, 128 ) )
+
+        gSizer1.Add( self.m_staticText7, 0, wx.ALL, 2 )
+
+        self.m_staticText8 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText8.Wrap( -1 )
+        self.m_staticText8.SetBackgroundColour( wx.Colour( 0, 128, 128 ) )
+
+        gSizer1.Add( self.m_staticText8, 0, wx.ALL, 2 )
+
+        self.m_staticText9 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText9.Wrap( -1 )
+        self.m_staticText9.SetBackgroundColour( wx.Colour( 0, 128, 0 ) )
+
+        gSizer1.Add( self.m_staticText9, 0, wx.ALL, 2 )
+
+        self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText10.Wrap( -1 )
+        self.m_staticText10.SetBackgroundColour( wx.Colour( 128, 0, 128 ) )
+
+        gSizer1.Add( self.m_staticText10, 0, wx.ALL, 2 )
+
+        self.m_staticText11 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText11.Wrap( -1 )
+        self.m_staticText11.SetBackgroundColour( wx.Colour( 128, 0, 0 ) )
+
+        gSizer1.Add( self.m_staticText11, 0, wx.ALL, 2 )
+
+        self.m_staticText12 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText12.Wrap( -1 )
+        self.m_staticText12.SetBackgroundColour( wx.Colour( 128, 128, 0 ) )
+
+        gSizer1.Add( self.m_staticText12, 0, wx.ALL, 2 )
+
+        self.m_staticText13 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText13.Wrap( -1 )
+        self.m_staticText13.SetBackgroundColour( wx.Colour( 128, 128, 128 ) )
+
+        gSizer1.Add( self.m_staticText13, 0, wx.ALL, 2 )
+
+        self.m_staticText14 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText14.Wrap( -1 )
+        self.m_staticText14.SetBackgroundColour( wx.Colour( 192, 192, 192 ) )
+
+        gSizer1.Add( self.m_staticText14, 0, wx.ALL, 2 )
+
+        self.m_staticText15 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 25,25 ), 0 )
+        self.m_staticText15.Wrap( -1 )
+        self.m_staticText15.SetBackgroundColour( wx.Colour( 0, 0, 0 ) )
+
+        gSizer1.Add( self.m_staticText15, 0, wx.ALL, 2 )
+
+
+        bSizer1.Add( gSizer1, 0, wx.ALL, 5 )
+
+        self.m_button1 = wx.Button( self, wx.ID_ANY, u"Custom", wx.DefaultPosition, wx.Size( -1,25 ), 0 )
+        bSizer1.Add( self.m_button1, 0, wx.ALL|wx.EXPAND, 2 )
+
+        self.SetSizer( bSizer1 )
+
+        bSizer1.Fit(self)
+
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+
         self.Layout()
 
+    def OnPaint(self, evt = None):
+        dc = wx.BufferedPaintDC(self)
+        dc.Clear()
 
-    def ProcessLeftDown(self, evt):
-#        self.log.write("ProcessLeftDown: %s\n" % evt.GetPosition())
-        return wx.PopupTransientWindow.ProcessLeftDown(self, evt)
-
-    def OnDismiss(self):
-#        self.log.write("OnDismiss\n")
-        pass
-
-    def OnButton(self, evt):
-        btn = evt.GetEventObject()
-        if btn.GetLabel() == "Press Me":
-            btn.SetLabel("Pressed")
-        else:
-            btn.SetLabel("Press Me")
+        rect = self.GetRect()
+        print rect
 
 
 class MyApp(wx.App):
@@ -226,7 +304,7 @@ class MyApp(wx.App):
             eval("self.frame.label_sub%d%d.SetLabel('')" % (i, i + 1))
 
         for i in range(1, 33):
-            label = "%02d:" % (33 - i)
+            label = "%02d:        " % (33 - i)
             eval("self.frame.label_%d.SetLabel(label)" % i)
             eval("self.frame.label_%d.SetMinSize((-1, %d))" % (i, WF_H_OFFSET))
         self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN - 3))
@@ -287,14 +365,9 @@ class MyApp(wx.App):
         self.frame.label_1.SetFont(f)
 
     def OnClickLabel1(self, evt):
-        win = TestTransientPopup(self.frame, wx.SIMPLE_BORDER)
-
-        # Show the popup right below or above the button
-        # depending on available screen space...
-        btn = evt.GetEventObject()
-        pos = btn.ClientToScreen( (0,0) )
-        sz =  btn.GetSize()
-        win.Position(pos, (0, sz[1]))
+        win = TestTransientPopup(self.frame, wx.NO_BORDER)
+        pos = wx.GetMousePosition()
+        win.Position(pos, (0, 0))
 
         win.Popup()
 

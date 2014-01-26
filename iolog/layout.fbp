@@ -357,7 +357,7 @@
                                             <property name="scroll_rate_x">5</property>
                                             <property name="scroll_rate_y">5</property>
                                             <property name="show">1</property>
-                                            <property name="size">170,-1</property>
+                                            <property name="size">-1,-1</property>
                                             <property name="subclass"></property>
                                             <property name="toolbar_pane">0</property>
                                             <property name="tooltip"></property>
@@ -4014,7 +4014,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -4180,7 +4180,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -4346,7 +4346,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -4512,7 +4512,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -4678,7 +4678,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -4844,7 +4844,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -5010,7 +5010,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>
@@ -5176,7 +5176,7 @@
                                                                 <property name="enabled">1</property>
                                                                 <property name="fg"></property>
                                                                 <property name="floatable">1</property>
-                                                                <property name="font">Segoe UI Symbol,90,92,10,74,1</property>
+                                                                <property name="font">Segoe UI Symbol,90,92,10,74,0</property>
                                                                 <property name="gripper">0</property>
                                                                 <property name="hidden"></property>
                                                                 <property name="id">wxID_ANY</property>

@@ -234,7 +234,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T1 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T1   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T1.Wrap( -1 )
-		self.lblMeasure_T1.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T1.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T1, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -246,7 +246,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T2 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T2   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T2.Wrap( -1 )
-		self.lblMeasure_T2.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T2.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T2, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -258,7 +258,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T3 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T3   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T3.Wrap( -1 )
-		self.lblMeasure_T3.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T3.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T3, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -270,7 +270,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T4 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T4   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T4.Wrap( -1 )
-		self.lblMeasure_T4.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T4.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T4, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -282,7 +282,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T5 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T5   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T5.Wrap( -1 )
-		self.lblMeasure_T5.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T5.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T5, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -294,7 +294,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T6 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T6   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T6.Wrap( -1 )
-		self.lblMeasure_T6.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T6.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T6, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -306,7 +306,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T7 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T7   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T7.Wrap( -1 )
-		self.lblMeasure_T7.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T7.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T7, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		
@@ -318,7 +318,7 @@ class myFrame ( wx.Frame ):
 		
 		self.lblMeasure_T8 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"   T8   ", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblMeasure_T8.Wrap( -1 )
-		self.lblMeasure_T8.SetFont( wx.Font( 10, 74, 90, 92, True, "Segoe UI Symbol" ) )
+		self.lblMeasure_T8.SetFont( wx.Font( 10, 74, 90, 92, False, "Segoe UI Symbol" ) )
 		
 		gSizer2.Add( self.lblMeasure_T8, 0, wx.ALIGN_CENTER_HORIZONTAL, 1 )
 		

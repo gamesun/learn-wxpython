@@ -65,7 +65,7 @@ class TestTransientPopup(wx.PopupTransientWindow):
     def __init__(self, parent, style):
         wx.PopupTransientWindow.__init__(self, parent, style)
 
-        self.SetBackgroundColour("#FFFFFF")
+        self.SetBackgroundColour(wx.Colour(255, 255, 255))
 
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
 
@@ -203,63 +203,65 @@ class TestTransientPopup(wx.PopupTransientWindow):
 
         self.m_button1.Bind(wx.EVT_BUTTON, self.OnBtnCustom)
 
-        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_PAINT, self.OnPaint_Window)
 
-        self.m_staticText1.Bind(wx.EVT_PAINT, self.OnPaint1)
-        self.m_staticText1.Bind(wx.EVT_LEFT_UP, self.OnLeftUp1)
-        self.m_staticText1.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterWindow)
-        self.m_staticText1.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveWindow)
+        for i in range(1, 16):
+            eval("self.m_staticText%d.Bind(wx.EVT_PAINT, lambda evt, self = self: self.OnPaint_StaticText(evt, %d))" % (i, i))
+            eval("self.m_staticText%d.Bind(wx.EVT_LEFT_UP, lambda evt, self = self: self.OnLeftUp_StaticText(evt, %d))" % (i, i))
+            eval("self.m_staticText%d.Bind(wx.EVT_ENTER_WINDOW, lambda evt, self = self: self.OnEnterWindow(evt, %d))" % (i, i))
+            eval("self.m_staticText%d.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveWindow)" % i)
 
         self.Layout()
 
-    def OnLeftUp1(self, evt = None):
-        self.color = self.m_staticText1.GetBackgroundColour()
+    def OnLeftUp_StaticText(self, evt, idx):
+        self.color = eval("self.m_staticText%d.GetBackgroundColour()" % idx)
         # TODO: set event
 
         self.Destroy()
 
-    def OnPaint1(self, evt = None):
-        dc = wx.BufferedPaintDC(self.m_staticText1)
+    def OnPaint_StaticText(self, evt, idx):
+        dc = eval("wx.BufferedPaintDC(self.m_staticText%d)" % idx)
         dc.Clear()
 
-        if self.focus is 1:
-            rect = self.m_staticText1.GetClientRect()
-            #rect.Deflate(1, 1)
-            dc.SetPen(wx.Pen((255, 226, 148)))
-            dc.SetBrush(wx.Brush("#000000", wx.BRUSHSTYLE_TRANSPARENT))
+        if self.focus is idx:
+            rect = eval("self.m_staticText%d.GetClientRect()" % idx)
+            dc.SetPen(wx.Pen(wx.Colour(255, 226, 148)))
+            dc.SetBrush(wx.Brush(wx.Colour(255, 255, 255), wx.BRUSHSTYLE_TRANSPARENT))
             dc.DrawRectangle(*rect)
 
-        #evt.Skip()
+        evt.Skip()
 
-    def OnPaint(self, evt = None):
+    def OnPaint_Window(self, evt = None):
         dc = wx.BufferedPaintDC(self)
         dc.Clear()
 
         # Draw the border of PopupWindow
         rect = self.GetClientRect()
-        dc.SetPen(wx.Pen("#868686"))
-        dc.SetBrush(wx.Brush("#000000", wx.BRUSHSTYLE_TRANSPARENT))
+        dc.SetPen(wx.Pen(wx.Colour(134, 134, 134)))
+        dc.SetBrush(wx.Brush(wx.Colour(255, 255, 255), wx.BRUSHSTYLE_TRANSPARENT))
         dc.DrawRectangle(*rect)
 
         # Draw the border of every color
-        dc.SetPen(wx.Pen("#C5C5C5"))
+        dc.SetPen(wx.Pen(wx.Colour(197, 197, 197)))
         for i in range(1, 16):
             rect = eval("self.m_staticText%d.GetRect()" % i)
             rect.Inflate(1, 1)
             dc.DrawRectangle(*rect)
 
         # Draw the border of focused color
-        if self.focus is 1:
-            rect = self.m_staticText1.GetRect()
+        if self.focus is not None:
+            rect = eval("self.m_staticText%d.GetRect()" % self.focus)
             rect.Inflate(1, 1)
-            dc.SetPen(wx.Pen((242, 148, 54)))
+            dc.SetPen(wx.Pen(wx.Colour(242, 148, 54)))
             dc.DrawRectangle(*rect)
 
-    def OnEnterWindow(self, evt = None):
-        self.focus = 1
+        evt.Skip()
+
+    def OnEnterWindow(self, evt, idx):
+        self.focus = idx
         self.Refresh(False)
 
-    def OnLeaveWindow(self, evt = None):
+    def OnLeaveWindow(self, evt):
         self.focus = None
         self.Refresh(False)
 

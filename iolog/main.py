@@ -184,12 +184,11 @@ class MyApp(wx.App):
             label = "%02d:        " % (33 - i)
             eval("self.frame.label_%d.SetLabel(label)" % i)
             eval("self.frame.label_%d.SetMinSize((-1, %d))" % (i, WF_H_OFFSET))
+            eval("self.frame.label_%d.Bind(wx.EVT_LEFT_UP, lambda evt, self = self: self.OnLeftUpLabel(evt, %d))" % (i, i))
+            eval("self.frame.label_%d.Bind(wx.EVT_ENTER_WINDOW, lambda evt, self = self: self.OnEnterLabel(evt, %d))" % (i, i))
+            eval("self.frame.label_%d.Bind(wx.EVT_LEAVE_WINDOW, lambda evt, self = self: self.OnLeaveLabel(evt, %d))" % (i, i))
         self.frame.label_topSpacer.SetMinSize((-1, WF_TOP_MARGIN - 3))
         self.frame.wdTitle.GetSizer().Layout()
-
-        self.frame.label_1.Bind(wx.EVT_LEFT_UP, self.OnLeftUpLabel1)
-        self.frame.label_1.Bind(wx.EVT_ENTER_WINDOW, self.OnEnterLabel)
-        self.frame.label_1.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveLabel)
 
         self.frame.Bind(pcs.EVT_COLOR_SELECT, self.OnColorSelect)
 
@@ -215,13 +214,13 @@ class MyApp(wx.App):
         self.sigFilePath = ""
         self.signalLabel = ["%02d:" % i for i in range(32, 0, -1)]
 
+        self.labelColorSelectFocus = None
+        self.waveformColor = [wx.Colour(0, 0, 0) for i in range(32)]
+
         self.config = ConfigParser.RawConfigParser()
         self.LoadSettings()
 
         return True
-
-    def OnColorSelect(self, evt):
-        print evt.color
 
     def OnEnterMeasure_T(self, evt, idx):
         ctrl = evt.GetEventObject()
@@ -235,22 +234,28 @@ class MyApp(wx.App):
         font.SetUnderlined(False)
         ctrl.SetFont(font)
 
-    def OnEnterLabel(self, evt = None):
-        f = self.frame.label_1.GetFont()
+    def OnEnterLabel(self, evt, idx):
+        f = eval("self.frame.label_%d.GetFont()" % idx)
         f.SetUnderlined(True)
-        self.frame.label_1.SetFont(f)
+        eval("self.frame.label_%d.SetFont(f)" % idx)
 
-    def OnLeaveLabel(self, evt = None):
-        f = self.frame.label_1.GetFont()
+    def OnLeaveLabel(self, evt, idx):
+        f = eval("self.frame.label_%d.GetFont()" % idx)
         f.SetUnderlined(False)
-        self.frame.label_1.SetFont(f)
+        eval("self.frame.label_%d.SetFont(f)" % idx)
 
-    def OnLeftUpLabel1(self, evt):
+    def OnLeftUpLabel(self, evt, idx):
+        self.labelColorSelectFocus = idx
         win = pcs.PopupColorSelector(self.frame, wx.NO_BORDER)
         pos = wx.GetMousePosition()
         win.Position(pos, (0, 0))
 
         win.Popup()
+
+    def OnColorSelect(self, evt):
+        self.waveformColor[self.labelColorSelectFocus - 1] = evt.color
+        eval("self.frame.label_%d.SetForegroundColour(evt.color)" % self.labelColorSelectFocus)
+        self.frame.wdTitle.Refresh(False)
 
     def LoadSettings(self):
         self.config.read('setting.ini')
@@ -452,23 +457,30 @@ class MyApp(wx.App):
         dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
 
         # TODO: use DrawLineList(sequence, pens=None) to optimize.
+        dc.SetPen(wx.Pen((150,150,150), 1))
         self.DrawGrid(dc)
+
         if 0 < len(self.waveform):
+            dc.SetPen(wx.TRANSPARENT_PEN)
+            dc.SetBrush(wx.Brush((224, 224, 224), wx.SOLID))
             for i, w in enumerate(self.waveform[1]):
                 self.DrawRect(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
+
         for i, x in enumerate(self.MeasureT_x):
             if x[0] is not None:
                 self.DrawMeasureLine(dc, x[0], i)
+
         if 0 < len(self.waveform):
             for i, w in enumerate(self.waveform[1]):
+                dc.SetPen(wx.Pen(self.waveformColor[i], 1))
                 self.DrawWave(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
+
         if self.movingT is not None:
             self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
 
     def DrawGrid(self, dc):
-        dc.SetPen(wx.Pen((150,150,150), 1))
         for i in range(32):
             dc.DrawLine(1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN, self.canvasFullSize.GetWidth() - 1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN)
 
@@ -478,7 +490,6 @@ class MyApp(wx.App):
             y0 = c0[1] * WF_H + y_offset
             x1 = c1[0] + x_margin
             y1 = c1[1] * WF_H + y_offset
-            dc.SetPen(wx.Pen(wx.BLACK, 1))
             dc.DrawLine(x0, y0, x1, y0)
             dc.DrawLine(x1, y0, x1, y1)
 
@@ -489,8 +500,6 @@ class MyApp(wx.App):
             x1 = c1[0] + x_margin
             y1 = c1[1] * WF_H + y_offset
             if c0[1] is 0:
-                dc.SetPen(wx.TRANSPARENT_PEN)
-                dc.SetBrush(wx.Brush((224, 224, 224), wx.SOLID))
                 dc.DrawRectangle(x0 + 1, y0 + 1, x1 - x0 - 1, WF_H - 1)
 
     def DrawArrow(self, dc, coord):

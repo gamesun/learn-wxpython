@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 #
-# Copyright (c) 2013-2014, gamesun
+# Copyright (c) 2014, gamesun
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,26 +31,35 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+
+__version__ = '1.0.1'
+__date__ = '2014-1-30'
+__author__ = 'gamesun'
+__credits__ = ['Metallicow']
+__url__ = 'https://github.com/gamesun/PopupColorSelector'
+
+
+
 import wx
 
 
-ColorTable = [
-    [wx.Colour(255, 255, 0),    u"Yellow"   ],      # 1
-    [wx.Colour(0, 255, 0),      u"Lime"     ],      # 2
-    [wx.Colour(0, 255, 255),    u"Aqua"     ],      # 3
-    [wx.Colour(255, 0, 255),    u"Fuchsia"  ],      # 4
-    [wx.Colour(0, 0, 255),      u"Blue"     ],      # 5
-    [wx.Colour(255, 0, 0),      u"Red"      ],      # 6
-    [wx.Colour(0, 0, 128),      u"Navy"     ],      # 7
-    [wx.Colour(0, 128, 128),    u"Teal"     ],      # 8
-    [wx.Colour(0, 128, 0),      u"Green"    ],      # 9
-    [wx.Colour(128, 0, 128),    u"Purple"   ],      # 10
-    [wx.Colour(128, 0, 0),      u"Maroon"   ],      # 11
-    [wx.Colour(128, 128, 0),    u"Olive"    ],      # 12
-    [wx.Colour(128, 128, 128),  u"Gray"     ],      # 13
-    [wx.Colour(192, 192, 192),  u"Silver"   ],      # 14
-    [wx.Colour(0, 0, 0),        u"Black"    ],      # 15
-]
+ColorTable = (
+    (wx.Colour(255, 255, 0),    u"Yellow"   ),      # 0
+    (wx.Colour(0, 255, 0),      u"Lime"     ),      # 1
+    (wx.Colour(0, 255, 255),    u"Aqua"     ),      # 2
+    (wx.Colour(255, 0, 255),    u"Fuchsia"  ),      # 3
+    (wx.Colour(0, 0, 255),      u"Blue"     ),      # 4
+    (wx.Colour(255, 0, 0),      u"Red"      ),      # 5
+    (wx.Colour(0, 0, 128),      u"Navy"     ),      # 6
+    (wx.Colour(0, 128, 128),    u"Teal"     ),      # 7
+    (wx.Colour(0, 128, 0),      u"Green"    ),      # 8
+    (wx.Colour(128, 0, 128),    u"Purple"   ),      # 9
+    (wx.Colour(128, 0, 0),      u"Maroon"   ),      # 10
+    (wx.Colour(128, 128, 0),    u"Olive"    ),      # 11
+    (wx.Colour(128, 128, 128),  u"Gray"     ),      # 12
+    (wx.Colour(192, 192, 192),  u"Silver"   ),      # 13
+    (wx.Colour(0, 0, 0),        u"Black"    ),      # 14
+)
 
 
 COLOR_SELECT = wx.NewEventType()
@@ -68,158 +77,44 @@ class ColorSelectEvent(wx.PyCommandEvent):
 
 
 class PopupColorSelector(wx.PopupTransientWindow):
-    """Adds a bit of text and mouse movement to the wx.PopupWindow"""
-    def __init__(self, parent, style):
-        wx.PopupTransientWindow.__init__(self, parent, style)
-
+    def __init__(self, parent):
+        wx.PopupTransientWindow.__init__(self, parent, wx.NO_BORDER)
         self.parent = parent
 
         self.SetBackgroundColour(wx.Colour(255, 255, 255))
+        bSizer1 = wx.BoxSizer(wx.VERTICAL)
+        gSizer1 = wx.GridSizer(0, 5, 0, 0)
 
-        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+        for i in range(15):
+            exec("self.m_staticText%d = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(24, 24), 0)" % i)
+            exec("self.m_staticText%d.Wrap(-1)" % i)
+            exec("self.m_staticText%d.SetBackgroundColour(ColorTable[%d][0])" % (i, i))
+            exec("self.m_staticText%d.SetToolTipString(ColorTable[%d][1])" % (i, i))
+            exec("gSizer1.Add(self.m_staticText%d, 0, wx.ALL, 3)" % i)
 
-        gSizer1 = wx.GridSizer( 0, 5, 0, 0 )
-
-        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText1.Wrap( -1 )
-        self.m_staticText1.SetBackgroundColour( ColorTable[0][0] )
-        self.m_staticText1.SetToolTipString( ColorTable[0][1] )
-
-        gSizer1.Add( self.m_staticText1, 0, wx.ALL, 3 )
-
-        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText2.Wrap( -1 )
-        self.m_staticText2.SetBackgroundColour( ColorTable[1][0] )
-        self.m_staticText2.SetToolTipString( ColorTable[1][1] )
-
-        gSizer1.Add( self.m_staticText2, 0, wx.ALL, 3 )
-
-        self.m_staticText3 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText3.Wrap( -1 )
-        self.m_staticText3.SetBackgroundColour( ColorTable[2][0] )
-        self.m_staticText3.SetToolTipString( ColorTable[2][1] )
-
-        gSizer1.Add( self.m_staticText3, 0, wx.ALL, 3 )
-
-        self.m_staticText4 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText4.Wrap( -1 )
-        self.m_staticText4.SetBackgroundColour( ColorTable[3][0] )
-        self.m_staticText4.SetToolTipString( ColorTable[3][1] )
-
-        gSizer1.Add( self.m_staticText4, 0, wx.ALL, 3 )
-
-        self.m_staticText5 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText5.Wrap( -1 )
-        self.m_staticText5.SetBackgroundColour( ColorTable[4][0] )
-        self.m_staticText5.SetToolTipString( ColorTable[4][1] )
-
-        gSizer1.Add( self.m_staticText5, 0, wx.ALL, 3 )
-
-        self.m_staticText6 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText6.Wrap( -1 )
-        self.m_staticText6.SetBackgroundColour( ColorTable[5][0] )
-        self.m_staticText6.SetToolTipString( ColorTable[5][1] )
-
-        gSizer1.Add( self.m_staticText6, 0, wx.ALL, 3 )
-
-        self.m_staticText7 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText7.Wrap( -1 )
-        self.m_staticText7.SetBackgroundColour( ColorTable[6][0] )
-        self.m_staticText7.SetToolTipString( ColorTable[6][1] )
-
-        gSizer1.Add( self.m_staticText7, 0, wx.ALL, 3 )
-
-        self.m_staticText8 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText8.Wrap( -1 )
-        self.m_staticText8.SetBackgroundColour( ColorTable[7][0] )
-        self.m_staticText8.SetToolTipString( ColorTable[7][1] )
-
-        gSizer1.Add( self.m_staticText8, 0, wx.ALL, 3 )
-
-        self.m_staticText9 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText9.Wrap( -1 )
-        self.m_staticText9.SetBackgroundColour( ColorTable[8][0] )
-        self.m_staticText9.SetToolTipString( ColorTable[8][1] )
-
-        gSizer1.Add( self.m_staticText9, 0, wx.ALL, 3 )
-
-        self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText10.Wrap( -1 )
-        self.m_staticText10.SetBackgroundColour( ColorTable[9][0] )
-        self.m_staticText10.SetToolTipString( ColorTable[9][1] )
-
-        gSizer1.Add( self.m_staticText10, 0, wx.ALL, 3 )
-
-        self.m_staticText11 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText11.Wrap( -1 )
-        self.m_staticText11.SetBackgroundColour( ColorTable[10][0] )
-        self.m_staticText11.SetToolTipString( ColorTable[10][1] )
-
-        gSizer1.Add( self.m_staticText11, 0, wx.ALL, 3 )
-
-        self.m_staticText12 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText12.Wrap( -1 )
-        self.m_staticText12.SetBackgroundColour( ColorTable[11][0] )
-        self.m_staticText12.SetToolTipString( ColorTable[11][1] )
-
-        gSizer1.Add( self.m_staticText12, 0, wx.ALL, 3 )
-
-        self.m_staticText13 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText13.Wrap( -1 )
-        self.m_staticText13.SetBackgroundColour( ColorTable[12][0] )
-        self.m_staticText13.SetToolTipString(  ColorTable[12][1] )
-
-        gSizer1.Add( self.m_staticText13, 0, wx.ALL, 3 )
-
-        self.m_staticText14 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText14.Wrap( -1 )
-        self.m_staticText14.SetBackgroundColour( ColorTable[13][0] )
-        self.m_staticText14.SetToolTipString( ColorTable[13][1] )
-
-        gSizer1.Add( self.m_staticText14, 0, wx.ALL, 3 )
-
-        self.m_staticText15 = wx.StaticText( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 24,24 ), 0 )
-        self.m_staticText15.Wrap( -1 )
-        self.m_staticText15.SetBackgroundColour( ColorTable[14][0] )
-        self.m_staticText15.SetToolTipString( ColorTable[14][1] )
-
-        gSizer1.Add( self.m_staticText15, 0, wx.ALL, 3 )
-
-
-        bSizer1.Add( gSizer1, 0, wx.ALL, 2 )
-
-        bSizer2 = wx.BoxSizer( wx.VERTICAL )
-
-        self.m_staticline1 = wx.StaticLine( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( -1,-1 ), wx.LI_HORIZONTAL )
-        bSizer2.Add( self.m_staticline1, 0, wx.EXPAND |wx.ALL, 0 )
-
-
-        bSizer1.Add( bSizer2, 0, wx.EXPAND|wx.LEFT|wx.RIGHT, 3 )
-
-        bSizer3 = wx.BoxSizer( wx.VERTICAL )
-
-        self.m_btnCustom = wx.Button( self, wx.ID_ANY, u"Custom", wx.DefaultPosition, wx.Size( -1,25 ), 0 )
-        self.m_btnCustom.SetToolTipString( u"Create custom color" )
-        bSizer3.Add( self.m_btnCustom, 0, wx.ALL|wx.EXPAND, 2 )
-
-
-        bSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
-
-        self.SetSizer( bSizer1 )
-
+        bSizer1.Add(gSizer1, 0, wx.ALL, 2)
+        bSizer2 = wx.BoxSizer(wx.VERTICAL)
+        self.m_staticline1 = wx.StaticLine(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(-1, -1), wx.LI_HORIZONTAL)
+        bSizer2.Add(self.m_staticline1, 0, wx.EXPAND |wx.ALL, 0)
+        bSizer1.Add(bSizer2, 0, wx.EXPAND|wx.LEFT|wx.RIGHT, 3)
+        bSizer3 = wx.BoxSizer(wx.VERTICAL)
+        self.m_btnCustom = wx.Button(self, wx.ID_ANY, u"Custom", wx.DefaultPosition, wx.Size(-1, 25), 0)
+        self.m_btnCustom.SetToolTipString(u"Create custom color")
+        bSizer3.Add(self.m_btnCustom, 0, wx.ALL|wx.EXPAND, 2)
+        bSizer1.Add(bSizer3, 1, wx.EXPAND, 5)
+        self.SetSizer(bSizer1)
         bSizer1.Fit(self)
 
-        self.focus = None
-
         self.m_btnCustom.Bind(wx.EVT_BUTTON, self.OnBtnCustom)
-
         self.Bind(wx.EVT_PAINT, self.OnPaint_Window)
 
-        for i in range(1, 16):
+        for i in range(15):
             eval("self.m_staticText%d.Bind(wx.EVT_PAINT, lambda evt, self = self: self.OnPaint_StaticText(evt, %d))" % (i, i))
             eval("self.m_staticText%d.Bind(wx.EVT_LEFT_UP, lambda evt, self = self: self.OnLeftUp_StaticText(evt, %d))" % (i, i))
             eval("self.m_staticText%d.Bind(wx.EVT_ENTER_WINDOW, lambda evt, self = self: self.OnEnterWindow(evt, %d))" % (i, i))
             eval("self.m_staticText%d.Bind(wx.EVT_LEAVE_WINDOW, self.OnLeaveWindow)" % i)
+
+        self.focus = None
 
         self.Layout()
 
@@ -256,7 +151,7 @@ class PopupColorSelector(wx.PopupTransientWindow):
         rect = self.GetClientRect()
         dc.DrawRectangle(*rect)
 
-        for i in range(1, 16):
+        for i in range(15):
             if self.focus is i:
                 dc.SetPen(wx.Pen(wx.Colour(242, 148, 54)))      # Draw the border of focused color
             else:

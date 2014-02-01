@@ -216,6 +216,8 @@ class MyApp(wx.App):
 
         self.labelColorSelectFocus = None
         self.waveformColor = [wx.Colour(0, 0, 0) for i in range(32)]
+        self.gridColor = [wx.Colour(150, 150, 150) for i in range(32)]
+        self.rectColor = [wx.Colour(224, 224, 224) for i in range(32)]
 
         self.config = ConfigParser.RawConfigParser()
         self.LoadSettings()
@@ -246,16 +248,26 @@ class MyApp(wx.App):
 
     def OnLeftUpLabel(self, evt, idx):
         self.labelColorSelectFocus = idx
-        win = pcs.PopupColorSelector(self.frame, wx.NO_BORDER)
+        win = pcs.PopupColorSelector(self.frame)
         pos = wx.GetMousePosition()
         win.Position(pos, (0, 0))
 
         win.Popup()
 
     def OnColorSelect(self, evt):
-        self.waveformColor[self.labelColorSelectFocus - 1] = evt.color
-        eval("self.frame.label_%d.SetForegroundColour(evt.color)" % self.labelColorSelectFocus)
+        color = evt.color
+        idx = self.labelColorSelectFocus - 1
+        self.waveformColor[idx] = color
+        self.gridColor[idx] = wx.Colour(((color[0] + 150) >= 256 and 255 or (color[0] + 150)),
+                                        ((color[1] + 150) >= 256 and 255 or (color[1] + 150)),
+                                        ((color[2] + 150) >= 256 and 255 or (color[2] + 150)))
+        self.rectColor[idx] = wx.Colour(((color[0] + 192) >= 256 and 255 or (color[0] + 192)),
+                                        ((color[1] + 192) >= 256 and 255 or (color[1] + 192)),
+                                        ((color[2] + 192) >= 256 and 255 or (color[2] + 192)))
+
+        eval("self.frame.label_%d.SetForegroundColour(color)" % self.labelColorSelectFocus)
         self.frame.wdTitle.Refresh(False)
+        self.frame.pnlCanvas.Refresh(False)
 
     def LoadSettings(self):
         self.config.read('setting.ini')
@@ -364,12 +376,12 @@ class MyApp(wx.App):
             self.movingT = None
 
     def OnTimer(self, evt):
-        pos = wx.GetMousePosition()
         try:
             rect = self.frame.wdCanvas.GetRect()
         except wx.PyDeadObjectError:
             return
         self.canvasSize = rect.GetSize()
+        pos = wx.GetMousePosition()
         pos = self.frame.ScreenToClient(pos)
         if rect.Contains(pos):
             if self.mousePosOld != pos:
@@ -457,13 +469,12 @@ class MyApp(wx.App):
         dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
 
         # TODO: use DrawLineList(sequence, pens=None) to optimize.
-        dc.SetPen(wx.Pen((150,150,150), 1))
         self.DrawGrid(dc)
 
         if 0 < len(self.waveform):
             dc.SetPen(wx.TRANSPARENT_PEN)
-            dc.SetBrush(wx.Brush((224, 224, 224), wx.SOLID))
             for i, w in enumerate(self.waveform[1]):
+                dc.SetBrush(wx.Brush(self.rectColor[i], wx.SOLID))
                 self.DrawRect(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
 
         for i, x in enumerate(self.MeasureT_x):
@@ -482,6 +493,7 @@ class MyApp(wx.App):
 
     def DrawGrid(self, dc):
         for i in range(32):
+            dc.SetPen(wx.Pen(self.gridColor[i], 1))
             dc.DrawLine(1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN, self.canvasFullSize.GetWidth() - 1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN)
 
     def DrawWave(self, dc, coord, x_margin, y_offset):

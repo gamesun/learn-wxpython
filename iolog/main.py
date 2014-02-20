@@ -41,6 +41,7 @@ from bisect import bisect_left
 import codecs
 import ConfigParser
 import PopupColorSelector as pcs
+import time
 
 # waveform parameters
 WF_LEFT_MARGIN = 5
@@ -191,6 +192,7 @@ class MyApp(wx.App):
         self.frame.wdTitle.GetSizer().Layout()
 
         self.frame.Bind(pcs.EVT_COLOR_SELECT, self.OnColorSelect)
+        self.frame.wdCanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
 
         self.sizerSigLabel = self.frame.wdTitle.GetSizer()
 
@@ -223,6 +225,13 @@ class MyApp(wx.App):
         self.LoadSettings()
 
         return True
+
+    def OnMouseWheel(self, evt):
+        if evt.WheelRotation > 0:
+            pass
+        else:
+            pass
+        
 
     def OnEnterMeasure_T(self, evt, idx):
         ctrl = evt.GetEventObject()
@@ -266,8 +275,8 @@ class MyApp(wx.App):
                                         ((color[2] + 192) >= 256 and 255 or (color[2] + 192)))
 
         eval("self.frame.label_%d.SetForegroundColour(color)" % self.labelColorSelectFocus)
-        self.frame.wdTitle.Refresh(False)
-        self.frame.pnlCanvas.Refresh(False)
+        self.frame.wdTitle.Refresh(eraseBackground = False)
+        self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def LoadSettings(self):
         self.config.read('setting.ini')
@@ -355,7 +364,7 @@ class MyApp(wx.App):
             self.OnMouseRightUp()
         self.movingT = idx
         self.MeasureT_x[self.movingT][0] = None
-        self.frame.pnlCanvas.Refresh(False)
+        self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def OnMouseLeftUp(self, evt):
         if self.movingT is not None:
@@ -376,94 +385,99 @@ class MyApp(wx.App):
             self.movingT = None
 
     def OnTimer(self, evt):
-        try:
-            rect = self.frame.wdCanvas.GetRect()
-        except wx.PyDeadObjectError:
-            return
-        self.canvasSize = rect.GetSize()
-        pos = wx.GetMousePosition()
-        pos = self.frame.ScreenToClient(pos)
-        if rect.Contains(pos):
-            if self.mousePosOld != pos:
-                self.mousePosOld = pos
+        if self.IsActive():
+            try:
+                rect = self.frame.wdCanvas.GetRect()
+            except wx.PyDeadObjectError:
+                pass
+            else:
+                start = time.time()
+                self.canvasSize = rect.GetSize()
+                pos = wx.GetMousePosition()
+                pos = self.frame.ScreenToClient(pos)
+                if rect.Contains(pos):
+                    if self.mousePosOld != pos:
+                        self.mousePosOld = pos
 
-                (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
-                (pos.x, pos.y) = (pos.x - rect.x, pos.y)
-                self.movingT_x = pos.x
+                        (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
+                        (pos.x, pos.y) = (pos.x - rect.x, pos.y)
+                        self.movingT_x = pos.x
 
-                if 0 < len(self.waveform):
-                    line = (pos.y - WF_TOP_MARGIN) / WF_H_OFFSET
+                        if 0 < len(self.waveform):
+                            line = (pos.y - WF_TOP_MARGIN) / WF_H_OFFSET
 
-                    if -1 < line < len(self.waveform[1]):
-                        idx = self.SearchIndex(pos.x - WF_LEFT_MARGIN, line)
-                        if idx < len(self.waveform[1][line]):
-                            if 0 < idx:
-                                arrowNew = [0,0,0,0]
-                                arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WF_LEFT_MARGIN
-                                arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WF_LEFT_MARGIN
-                                arrowNew[1] = arrowNew[3] = line * WF_H_OFFSET + WF_H / 2 + WF_TOP_MARGIN
-                                if self.arrow != arrowNew:
-                                    self.arrow = arrowNew[:]
-                                    self.frame.pnlCanvas.Refresh(False)
-                                    str1 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
-                                    str2 = 'T2:      %d' % self.originWave[1][line][idx][0]
-                                    str3 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
-                                    str4 = self.signalLabel[line]
-                                    self.frame.lblInfo1.SetLabel(str1)
-                                    self.frame.lblInfo2.SetLabel(str2)
-                                    self.frame.lblInfo3.SetLabel(str3)
-                                    self.frame.lblInfo4.SetLabel(str4)
+                            if -1 < line < len(self.waveform[1]):
+                                idx = self.SearchIndex(pos.x - WF_LEFT_MARGIN, line)
+                                if idx < len(self.waveform[1][line]):
+                                    if 0 < idx:
+                                        arrowNew = [0,0,0,0]
+                                        arrowNew[0] = self.waveform[1][line][idx-1][0] + 2 + WF_LEFT_MARGIN
+                                        arrowNew[2] = self.waveform[1][line][idx][0] - 2 + WF_LEFT_MARGIN
+                                        arrowNew[1] = arrowNew[3] = line * WF_H_OFFSET + WF_H / 2 + WF_TOP_MARGIN
+                                        if self.arrow != arrowNew:
+                                            self.arrow = arrowNew[:]
+                                            self.frame.pnlCanvas.Refresh(eraseBackground = False)
+                                            str1 = 'T1:      %d' % self.originWave[1][line][idx-1][0]
+                                            str2 = 'T2:      %d' % self.originWave[1][line][idx][0]
+                                            str3 = '|T1-T2|= %d' % (self.originWave[1][line][idx][0] - self.originWave[1][line][idx-1][0])
+                                            str4 = self.signalLabel[line]
+                                            self.frame.lblInfo1.SetLabel(str1)
+                                            self.frame.lblInfo2.SetLabel(str2)
+                                            self.frame.lblInfo3.SetLabel(str3)
+                                            self.frame.lblInfo4.SetLabel(str4)
 
-                            if self.autoAlign:
-                                if 0 < idx:
-                                    distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WF_LEFT_MARGIN
-                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_LEFT_MARGIN
-                                    if distanceToBefore < distanceToAfter:
-                                        if distanceToBefore < 30:
-                                            #self.movingT_x = self.waveform[1][line][idx-1][0] + WF_LEFT_MARGIN
-                                            self.movingT_x = pos.x - distanceToBefore
-                                    else:
-                                        if distanceToAfter < 30:
-                                            #self.movingT_x = self.waveform[1][line][idx][0] + WF_LEFT_MARGIN
-                                            self.movingT_x = pos.x + distanceToAfter
-                                else:
-                                    distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_LEFT_MARGIN
-                                    if distanceToAfter < 20:
-                                        self.movingT_x = pos.x + distanceToAfter
+                                    if self.autoAlign:
+                                        if 0 < idx:
+                                            distanceToBefore = pos.x - self.waveform[1][line][idx-1][0] - WF_LEFT_MARGIN
+                                            distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_LEFT_MARGIN
+                                            if distanceToBefore < distanceToAfter:
+                                                if distanceToBefore < 30:
+                                                    #self.movingT_x = self.waveform[1][line][idx-1][0] + WF_LEFT_MARGIN
+                                                    self.movingT_x = pos.x - distanceToBefore
+                                            else:
+                                                if distanceToAfter < 30:
+                                                    #self.movingT_x = self.waveform[1][line][idx][0] + WF_LEFT_MARGIN
+                                                    self.movingT_x = pos.x + distanceToAfter
+                                        else:
+                                            distanceToAfter = self.waveform[1][line][idx][0] - pos.x + WF_LEFT_MARGIN
+                                            if distanceToAfter < 20:
+                                                self.movingT_x = pos.x + distanceToAfter
 
-                if self.movingT is not None:
-                    self.MeasureT_x[self.movingT][1] = (self.movingT_x - WF_LEFT_MARGIN) / self.zoomFactor
-                    strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
-                    eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
-                    x_current = self.MeasureT_x[self.movingT][1]
-                    if 0 < self.movingT < 7:
-                        x_before = self.MeasureT_x[self.movingT - 1][1]
-                        x_after = self.MeasureT_x[self.movingT + 1][1]
-                        if x_current is not None:
-                            if x_before is not None:
-                                strLabel = '%dms' % abs(x_current - x_before)
-                                eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
-                            if x_after is not None:
-                                strLabel = '%dms' % abs(x_current - x_after)
-                                eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT + 1, self.movingT + 2))
-                    elif self.movingT == 0:
-                        x_after = self.MeasureT_x[self.movingT + 1][1]
-                        if x_after is not None:
-                            strLabel = '%dms' % abs(x_current - x_after)
-                            eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT + 1, self.movingT + 2))
-                    elif self.movingT == 7:
-                        x_before = self.MeasureT_x[self.movingT - 1][1]
-                        if x_before is not None:
-                            strLabel = '%dms' % abs(x_current - x_before)
-                            eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
+                        if self.movingT is not None:
+                            self.MeasureT_x[self.movingT][1] = (self.movingT_x - WF_LEFT_MARGIN) / self.zoomFactor
+                            strLabel = '%dms' % self.MeasureT_x[self.movingT][1]
+                            eval("self.frame.label_T%d.SetLabel(strLabel)" % (self.movingT + 1))
+                            x_current = self.MeasureT_x[self.movingT][1]
+                            if 0 < self.movingT < 7:
+                                x_before = self.MeasureT_x[self.movingT - 1][1]
+                                x_after = self.MeasureT_x[self.movingT + 1][1]
+                                if x_current is not None:
+                                    if x_before is not None:
+                                        strLabel = '%dms' % abs(x_current - x_before)
+                                        eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
+                                    if x_after is not None:
+                                        strLabel = '%dms' % abs(x_current - x_after)
+                                        eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT + 1, self.movingT + 2))
+                            elif self.movingT == 0:
+                                x_after = self.MeasureT_x[self.movingT + 1][1]
+                                if x_after is not None:
+                                    strLabel = '%dms' % abs(x_current - x_after)
+                                    eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT + 1, self.movingT + 2))
+                            elif self.movingT == 7:
+                                x_before = self.MeasureT_x[self.movingT - 1][1]
+                                if x_before is not None:
+                                    strLabel = '%dms' % abs(x_current - x_before)
+                                    eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
 
-                self.frame.pnlCanvas.Refresh(False)
-
+                        self.frame.pnlCanvas.Refresh(eraseBackground = False)
+#                print "Time: %s" % (time.time() - start)
+                
     def SearchIndex(self, px, py):
         l_x = [p[0] for p in self.waveform[1][py]]
         return bisect_left(l_x, px)
 
     def OnPaint(self, evt = None):
+        start = time.time()
         dc = wx.BufferedPaintDC(self.frame.pnlCanvas)
         dc.Clear()
         dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
@@ -491,6 +505,9 @@ class MyApp(wx.App):
         if self.movingT is not None:
             self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
 
+#        print "Paint: %s" % (time.time() - start)
+        
+        
     def DrawGrid(self, dc):
         for i in range(32):
             dc.SetPen(wx.Pen(self.gridColor[i], 1))
@@ -622,7 +639,7 @@ class MyApp(wx.App):
 
         file.close()
 
-        self.frame.pnlCanvas.Refresh()      # clear the canvas
+        self.frame.pnlCanvas.Refresh(eraseBackground = False)      # clear the canvas
         self.originWave = Parser(lstData)
         self.ZoomWaveform()
 
@@ -632,7 +649,7 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.SetSize(self.canvasFullSize)
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
-        self.frame.pnlCanvas.Refresh(False)
+        self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def OnAbout(self, evt = None):
         # First we create and fill the info object

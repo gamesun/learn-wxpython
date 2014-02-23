@@ -192,6 +192,8 @@ class MyApp(wx.App):
         self.frame.wdTitle.GetSizer().Layout()
 
         self.frame.Bind(pcs.EVT_COLOR_SELECT, self.OnColorSelect)
+        self.frame.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
+        self.frame.wdTitle.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
         self.frame.wdCanvas.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
 
         self.sizerSigLabel = self.frame.wdTitle.GetSizer()

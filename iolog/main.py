@@ -230,9 +230,9 @@ class MyApp(wx.App):
 
     def OnMouseWheel(self, evt):
         if evt.WheelRotation > 0:
-            pass
+            self.Zoom(self.zoomFactor * 1.25)
         else:
-            pass
+            self.Zoom(self.zoomFactor * 0.8)
         
 
     def OnEnterMeasure_T(self, evt, idx):

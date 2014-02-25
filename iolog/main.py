@@ -320,16 +320,30 @@ class MyApp(wx.App):
 
         file.close()
 
-        for line in lines:
-            r = regex_sig.search(line)
-            if r:
-                idx = int(r.group('index'))
-                lbl = '%02d:%s' % (idx + 1, r.group('signalLabel'))
-                self.signalLabel[31 - idx] = lbl
-                idx = 32 - idx
-                if 1 <= idx <= 32:
-                    self.signalLabel
-                    eval('self.frame.label_%d.SetLabel(lbl)' % idx)
+        if 0:       # 0 ~ 31
+            for line in lines:
+                r = regex_sig.search(line)
+                if r:
+                    idx = int(r.group('index'))
+                    lbl = '%02d:%s' % (idx + 1, r.group('signalLabel'))
+                    self.signalLabel[31 - idx] = lbl
+                    idx = 32 - idx
+                    if 1 <= idx <= 32:
+                        self.signalLabel
+                        eval('self.frame.label_%d.SetLabel(lbl)' % idx)
+        else:       # 1 ~ 32
+            for line in lines:
+                r = regex_sig.search(line)
+                if r:
+                    idx = int(r.group('index'))
+                    lbl = '%02d:%s' % (idx, r.group('signalLabel'))
+                    self.signalLabel[31 - idx] = lbl
+                    idx = 33 - idx
+                    if 1 <= idx <= 32:
+                        self.signalLabel
+                        eval('self.frame.label_%d.SetLabel(lbl)' % idx)
+
+        self.SaveSettings()
 
     def OnAutoAlign(self, evt = None):
         if evt.Selection == 1:

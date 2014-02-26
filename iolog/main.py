@@ -284,10 +284,10 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def LoadSettings(self):
-        self.config.read('setting.ini')
+        self.config.read("%s\\setting.ini" % os.path.dirname(os.path.realpath(__file__)))
         try:
             if self.config.has_section('sig_file'):
-                self.LoadSigFile(self.config.get('sig_file', 'path'))
+                self.LoadSigFile(unicode(self.config.get('sig_file', 'path'), 'utf-8'))
         except:
             pass
 

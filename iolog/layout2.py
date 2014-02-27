@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*- 
 
 ###########################################################################
-## Python code generated with wxFormBuilder (version Nov  6 2013)
+## Python code generated with wxFormBuilder (version Feb 26 2014)
 ## http://www.wxformbuilder.org/
 ##
 ## PLEASE DO "NOT" EDIT THIS FILE!
@@ -21,7 +21,6 @@ class myFrame ( wx.Frame ):
 		
 		self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
 		
-		self.mainframe_statusbar = self.CreateStatusBar( 1, wx.ST_SIZEGRIP, wx.ID_ANY )
 		bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
 		
 		self.pnlmain = wx.Panel( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( 850, 610 ), wx.TAB_TRAVERSAL )

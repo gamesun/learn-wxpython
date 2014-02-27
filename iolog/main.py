@@ -144,6 +144,14 @@ class MyApp(wx.App):
         menuBar.Check(idZoom7, True)
         menuBar.Check(idAutoAlign, True)
 
+        # Make a statusbar
+        self.statusbar = self.frame.CreateStatusBar(4, wx.ST_SIZEGRIP)
+        self.statusbar.SetStatusWidths([-1, 180, 100, 70])
+        # statusbar fields
+        statusbar_fields = ["", "signal", "T1 - T2:", "Zoom:"]
+        for i in range(len(statusbar_fields)):
+            self.statusbar.SetStatusText(statusbar_fields[i], i)
+            
         self.zoomFactor = 1.0
         self.autoAlign = True
         self.timer = wx.Timer(self)
@@ -597,6 +605,7 @@ class MyApp(wx.App):
     def Zoom(self, factor):
         self.arrow = None
         self.zoomFactor = factor
+        self.statusbar.SetStatusText('%.2f%%' % (factor * 100), 3)
         if 0 < len(self.waveform):
             self.ZoomWaveform()
 

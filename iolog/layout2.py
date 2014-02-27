@@ -8,7 +8,7 @@
 ###########################################################################
 
 import wx
-#import wx.xrc
+import wx.xrc
 
 ###########################################################################
 ## Class myFrame
@@ -191,41 +191,43 @@ class myFrame ( wx.Frame ):
 		
 		self.lbl0 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"Measurements", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lbl0.Wrap( -1 )
+		self.lbl0.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
+		
 		bSizer7.Add( self.lbl0, 0, wx.ALL, 5 )
 		
-		self.lblInfo1 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.lblInfo1 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"T1:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo1.Wrap( 0 )
-		self.lblInfo1.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.lblInfo1.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
 		
 		bSizer7.Add( self.lblInfo1, 0, 0, 0 )
 		
-		self.lblInfo2 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.lblInfo2 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"T2:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo2.Wrap( 0 )
-		self.lblInfo2.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.lblInfo2.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
 		
 		bSizer7.Add( self.lblInfo2, 0, 0, 0 )
 		
-		self.lblInfo3 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.lblInfo3 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"T1-T2", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo3.Wrap( 0 )
-		self.lblInfo3.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.lblInfo3.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
 		
 		bSizer7.Add( self.lblInfo3, 0, 0, 0 )
 		
-		self.lblInfo4 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.lblInfo4 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, u"signname", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo4.Wrap( 0 )
-		self.lblInfo4.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.lblInfo4.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
 		
 		bSizer7.Add( self.lblInfo4, 0, 0, 0 )
 		
 		self.lblInfo5 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo5.Wrap( 0 )
-		self.lblInfo5.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.lblInfo5.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
 		
 		bSizer7.Add( self.lblInfo5, 0, 0, 0 )
 		
 		self.lblInfo6 = wx.StaticText( self.pnlMeasure, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.lblInfo6.Wrap( 0 )
-		self.lblInfo6.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), 70, 90, 90, False, wx.EmptyString ) )
+		self.lblInfo6.SetFont( wx.Font( 10, 70, 90, 90, False, "Segoe UI Symbol" ) )
 		
 		bSizer7.Add( self.lblInfo6, 0, 0, 0 )
 		
@@ -420,7 +422,7 @@ class myFrame ( wx.Frame ):
 		
 		self.pnlMeasure.SetSizer( bSizer7 )
 		self.pnlMeasure.Layout()
-		bSizer6.Add( self.pnlMeasure, 1, wx.BOTTOM|wx.EXPAND, 1 )
+		bSizer6.Add( self.pnlMeasure, 1, wx.BOTTOM|wx.EXPAND|wx.LEFT|wx.RIGHT, 3 )
 		
 		
 		bSizer3.Add( bSizer6, 0, wx.EXPAND, 0 )

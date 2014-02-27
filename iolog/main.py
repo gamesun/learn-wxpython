@@ -148,7 +148,7 @@ class MyApp(wx.App):
         self.statusbar = self.frame.CreateStatusBar(4, wx.ST_SIZEGRIP)
         self.statusbar.SetStatusWidths([-1, 180, 100, 70])
         # statusbar fields
-        statusbar_fields = ["", "signal", "T1 - T2:", "Zoom:"]
+        statusbar_fields = ["", "", "", "100.00%"]
         for i in range(len(statusbar_fields)):
             self.statusbar.SetStatusText(statusbar_fields[i], i)
             
@@ -452,6 +452,8 @@ class MyApp(wx.App):
                                             self.frame.lblInfo2.SetLabel(str2)
                                             self.frame.lblInfo3.SetLabel(str3)
                                             self.frame.lblInfo4.SetLabel(str4)
+                                            self.statusbar.SetStatusText(str4, 1)
+                                            self.statusbar.SetStatusText(str3, 2)
 
                                     if self.autoAlign:
                                         if 0 < idx:

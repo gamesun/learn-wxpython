@@ -117,15 +117,15 @@ class MyApp(wx.App):
         menuZoom.AppendRadioItem(idZoom5, "200%" )
         menuZoom.AppendRadioItem(idZoom6, "150%" )
         menuZoom.AppendRadioItem(idZoom7, "100%" )
-        menuZoom.AppendRadioItem(idZoom8, "90%"  )
-        menuZoom.AppendRadioItem(idZoom9, "80%"  )
-        menuZoom.AppendRadioItem(idZoom10, "70%" )
-        menuZoom.AppendRadioItem(idZoom11, "60%" )
-        menuZoom.AppendRadioItem(idZoom12, "50%" )
-        menuZoom.AppendRadioItem(idZoom13, "40%" )
-        menuZoom.AppendRadioItem(idZoom14, "30%" )
-        menuZoom.AppendRadioItem(idZoom15, "20%" )
-        menuZoom.AppendRadioItem(idZoom16, "10%" )
+        menuZoom.AppendRadioItem(idZoom8, "75%"  )
+        menuZoom.AppendRadioItem(idZoom9, "50%"  )
+        menuZoom.AppendRadioItem(idZoom10, "20%" )
+        menuZoom.AppendRadioItem(idZoom11, "10%" )
+        menuZoom.AppendRadioItem(idZoom12, "5%" )
+        menuZoom.AppendRadioItem(idZoom13, "3%" )
+        menuZoom.AppendRadioItem(idZoom14, "1%" )
+        menuZoom.AppendRadioItem(idZoom15, "0.5%" )
+        menuZoom.AppendRadioItem(idZoom16, "0.1%" )
         menuBar.Append(menuZoom, "&Zoom")
 
         # 4th menu
@@ -214,7 +214,7 @@ class MyApp(wx.App):
 
         self.canvasSize = wx.Size()
         self.canvasFullSize = wx.Size(0, 32 * WF_H_OFFSET + WF_TOP_MARGIN)
-        self.mousePosOld = None
+        self.mousePosOld = (0, 0)
         self.originWave = []
         self.waveform = []
         self.arrow = None
@@ -348,7 +348,7 @@ class MyApp(wx.App):
                 if r:
                     idx = int(r.group('index'))
                     lbl = '%02d:%s' % (idx, r.group('signalLabel'))
-                    self.signalLabel[31 - idx] = lbl
+                    self.signalLabel[32 - idx] = lbl
                     idx = 33 - idx
                     if 1 <= idx <= 32:
                         self.signalLabel
@@ -410,6 +410,7 @@ class MyApp(wx.App):
             elif self.movingT == 7:
                 eval("self.frame.label_sub%d%d.SetLabel('')" % (self.movingT, self.movingT + 1))
             self.movingT = None
+            self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def OnTimer(self, evt):
         if self.IsActive():
@@ -424,7 +425,7 @@ class MyApp(wx.App):
                 pos = self.frame.ScreenToClient(pos)
                 if rect.Contains(pos):
                     if self.mousePosOld != pos:
-                        self.mousePosOld = pos
+                        self.mousePosOld = pos[:]
 
                         (pos.x, pos.y) = self.frame.wdCanvas.CalcUnscrolledPosition((pos.x, pos.y))
                         (pos.x, pos.y) = (pos.x - rect.x, pos.y)
@@ -498,7 +499,7 @@ class MyApp(wx.App):
                                     strLabel = '%dms' % abs(x_current - x_before)
                                     eval('self.frame.label_sub%d%d.SetLabel(strLabel)' % (self.movingT, self.movingT + 1))
 
-                        self.frame.pnlCanvas.Refresh(eraseBackground = False)
+                            self.frame.pnlCanvas.Refresh(eraseBackground = False)
 #                print "Time: %s" % (time.time() - start)
                 
     def SearchIndex(self, px, py):
@@ -534,7 +535,7 @@ class MyApp(wx.App):
         if self.movingT is not None:
             self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
 
-#        print "Paint: %s" % (time.time() - start)
+        print "Paint: %s" % (time.time() - start)
         
         
     def DrawGrid(self, dc):
@@ -566,7 +567,7 @@ class MyApp(wx.App):
         dc.DrawLines([[coord[2]-2,coord[3]-2],[coord[2],coord[3]],[coord[2]-3,coord[3]+3]])
 
     def DrawMeasureLine(self, dc, x, id):
-        dc.SetPen(wx.Pen(self.Tcolor[id], 2, style = wx.SHORT_DASH))
+        dc.SetPen(wx.Pen(self.Tcolor[id], 1, style = wx.DOT))
         dc.DrawText('%d' % (id + 1), x - 3, -1)
         dc.DrawLine(x, MEASURE_LINE_TOP, x, MEASURE_LINE_BTM)
         dc.DrawText('%d' % (id + 1), x - 3, MEASURE_LINE_BTM - 2)
@@ -586,23 +587,23 @@ class MyApp(wx.App):
     def OnZoom7(self, evt):
         self.Zoom( 1.0 )
     def OnZoom8(self, evt):
-        self.Zoom( 0.9 )
+        self.Zoom( 0.75 )
     def OnZoom9(self, evt):
-        self.Zoom( 0.8 )
-    def OnZoom10(self, evt):
-        self.Zoom( 0.7 )
-    def OnZoom11(self, evt):
-        self.Zoom( 0.6 )
-    def OnZoom12(self, evt):
         self.Zoom( 0.5 )
-    def OnZoom13(self, evt):
-        self.Zoom( 0.4 )
-    def OnZoom14(self, evt):
-        self.Zoom( 0.3 )
-    def OnZoom15(self, evt):
+    def OnZoom10(self, evt):
         self.Zoom( 0.2 )
-    def OnZoom16(self, evt):
+    def OnZoom11(self, evt):
         self.Zoom( 0.1 )
+    def OnZoom12(self, evt):
+        self.Zoom( 0.05 )
+    def OnZoom13(self, evt):
+        self.Zoom( 0.03 )
+    def OnZoom14(self, evt):
+        self.Zoom( 0.01 )
+    def OnZoom15(self, evt):
+        self.Zoom( 0.005 )
+    def OnZoom16(self, evt):
+        self.Zoom( 0.001 )
 
     def Zoom(self, factor):
         self.arrow = None
@@ -675,6 +676,7 @@ class MyApp(wx.App):
 
     def ZoomWaveform(self):
         self.waveform = [self.originWave[0]*self.zoomFactor,[[(p[0]*self.zoomFactor, p[1]) for p in line] for line in self.originWave[1]]]
+        self.paintWaveform = []
         self.canvasFullSize = wx.Size(self.waveform[0] + 2 * WF_LEFT_MARGIN, 32 * WF_H_OFFSET + 2 * WF_TOP_MARGIN)
         self.frame.pnlCanvas.SetSize(self.canvasFullSize)
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)

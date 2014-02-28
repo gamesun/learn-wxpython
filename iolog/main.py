@@ -217,6 +217,7 @@ class MyApp(wx.App):
         self.mousePosOld = (0, 0)
         self.originWave = []
         self.waveform = []
+        self.paintWaveform = []
         self.arrow = None
 
         self.movingT = None
@@ -526,9 +527,9 @@ class MyApp(wx.App):
                 self.DrawMeasureLine(dc, x[0], i)
 
         if 0 < len(self.waveform):
-            for i, w in enumerate(self.waveform[1]):
+            for i, w in enumerate(self.paintWaveform[1]):
                 dc.SetPen(wx.Pen(self.waveformColor[i], 1))
-                self.DrawWave(dc, w, WF_LEFT_MARGIN, (WF_H_OFFSET * i + WF_TOP_MARGIN))
+                dc.DrawLines(w)
             if self.arrow is not None:
                 self.DrawArrow(dc, self.arrow)
 
@@ -542,15 +543,6 @@ class MyApp(wx.App):
         for i in range(32):
             dc.SetPen(wx.Pen(self.gridColor[i], 1))
             dc.DrawLine(1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN, self.canvasFullSize.GetWidth() - 1, i * WF_H_OFFSET + WF_H + WF_TOP_MARGIN)
-
-    def DrawWave(self, dc, coord, x_margin, y_offset):
-        for c0, c1 in zip(coord[0:], coord[1:]):
-            x0 = c0[0] + x_margin
-            y0 = c0[1] * WF_H + y_offset
-            x1 = c1[0] + x_margin
-            y1 = c1[1] * WF_H + y_offset
-            dc.DrawLine(x0, y0, x1, y0)
-            dc.DrawLine(x1, y0, x1, y1)
 
     def DrawRect(self, dc, coord, x_margin, y_offset):
         for c0, c1 in zip(coord[0:], coord[1:]):
@@ -677,6 +669,19 @@ class MyApp(wx.App):
     def ZoomWaveform(self):
         self.waveform = [self.originWave[0]*self.zoomFactor,[[(p[0]*self.zoomFactor, p[1]) for p in line] for line in self.originWave[1]]]
         self.paintWaveform = []
+        self.paintWaveform.append(self.waveform[0])
+        self.paintWaveform.append([])
+        for i, w in enumerate(self.waveform[1]):
+            y_offset = (WF_H_OFFSET * i + WF_TOP_MARGIN)
+            w_tmp = [[w[0][0] + WF_LEFT_MARGIN, w[0][1] * WF_H + y_offset],]
+            for p0, p2 in zip(w, w[1:]):
+                p0 = [p0[0] + WF_LEFT_MARGIN, p0[1] * WF_H + y_offset]
+                p2 = [p2[0] + WF_LEFT_MARGIN, p2[1] * WF_H + y_offset]
+                p1 = (p2[0], p0[1])
+                w_tmp.append(p1)
+                w_tmp.append(p2)
+            self.paintWaveform[1].append(w_tmp)
+        
         self.canvasFullSize = wx.Size(self.waveform[0] + 2 * WF_LEFT_MARGIN, 32 * WF_H_OFFSET + 2 * WF_TOP_MARGIN)
         self.frame.pnlCanvas.SetSize(self.canvasFullSize)
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)

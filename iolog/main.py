@@ -43,8 +43,8 @@ import ConfigParser
 import PopupColorSelector as pcs
 import time
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 # waveform parameters
 WF_LEFT_MARGIN = 5
@@ -219,7 +219,8 @@ class MyApp(wx.App):
         self.waveform = []
         self.paintWaveform = []
         self.arrow = None
-
+        self.pcsWin = None
+        
         self.movingT = None
         self.movingT_x = 0
 
@@ -271,11 +272,11 @@ class MyApp(wx.App):
 
     def OnLeftUpLabel(self, evt, idx):
         self.labelColorSelectFocus = idx
-        win = pcs.PopupColorSelector(self.frame)
+        self.pcsWin = pcs.PopupColorSelector(self.frame)
         pos = wx.GetMousePosition()
-        win.Position(pos, (0, 0))
+        self.pcsWin.Position(pos, (0, 0))
 
-        win.Popup()
+        self.pcsWin.Popup()
 
     def OnColorSelect(self, evt):
         color = evt.color
@@ -293,7 +294,7 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def LoadSettings(self):
-        self.config.read("%s\\setting.ini" % os.path.dirname(os.path.realpath(__file__)))
+        self.config.read("%s\\setting.ini" % os.path.dirname(os.path.realpath(sys.argv[0])))
         try:
             if self.config.has_section('sig_file'):
                 self.LoadSigFile(unicode(self.config.get('sig_file', 'path'), 'utf-8'))
@@ -306,7 +307,7 @@ class MyApp(wx.App):
 
         self.config.set('sig_file', 'path', self.sigFilePath)
 
-        with open("%s\\setting.ini" % os.path.dirname(os.path.realpath(__file__)), 'w') as configfile:
+        with open("%s\\setting.ini" % os.path.dirname(os.path.realpath(sys.argv[0])), 'w') as configfile:
             self.config.write(configfile)
 
     def OnSplitterDClick(self, evt):
@@ -414,7 +415,12 @@ class MyApp(wx.App):
             self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def OnTimer(self, evt):
-        if self.IsActive():
+        try:
+            pcsWinIsShown = self.pcsWin.IsShown()
+        except:
+            pcsWinIsShown = False
+
+        if self.IsActive() and (not pcsWinIsShown):
             try:
                 rect = self.frame.wdCanvas.GetRect()
             except wx.PyDeadObjectError:
@@ -513,7 +519,6 @@ class MyApp(wx.App):
         dc.Clear()
         dc.SetFont(wx.Font(9, wx.MODERN, wx.NORMAL, wx.NORMAL, 0, "Consolas"))
 
-        # TODO: use DrawLineList(sequence, pens=None) to optimize.
         self.DrawGrid(dc)
 
         if 0 < len(self.waveform):

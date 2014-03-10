@@ -32,7 +32,7 @@
 #
 
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __date__ = '2014-1-30'
 __author__ = 'gamesun'
 __credits__ = ['Metallicow']
@@ -43,13 +43,24 @@ __url__ = 'https://github.com/gamesun/PopupColorSelector'
 import wx
 
 
+COLOR_PAD_ROW_NUM = 0
+COLOR_PAD_COL_NUM = 5
+
 ColorTable = (
-    (wx.Colour(128, 128, 0),    u"Olive"    ),      # 11
+    (wx.Colour(255, 255, 0),    u"Yellow"   ),      # 0
+    (wx.Colour(0, 255, 0),      u"Lime"     ),      # 1
+    (wx.Colour(0, 255, 255),    u"Aqua"     ),      # 2
+    (wx.Colour(255, 0, 255),    u"Fuchsia"  ),      # 3
     (wx.Colour(0, 0, 255),      u"Blue"     ),      # 4
     (wx.Colour(255, 0, 0),      u"Red"      ),      # 5
+    (wx.Colour(0, 0, 128),      u"Navy"     ),      # 6
+    (wx.Colour(0, 128, 128),    u"Teal"     ),      # 7
     (wx.Colour(0, 128, 0),      u"Green"    ),      # 8
-    (wx.Colour(255, 0, 255),    u"Fuchsia"  ),      # 3
+    (wx.Colour(128, 0, 128),    u"Purple"   ),      # 9
+    (wx.Colour(128, 0, 0),      u"Maroon"   ),      # 10
+    (wx.Colour(128, 128, 0),    u"Olive"    ),      # 11
     (wx.Colour(128, 128, 128),  u"Gray"     ),      # 12
+    (wx.Colour(192, 192, 192),  u"Silver"   ),      # 13
     (wx.Colour(0, 0, 0),        u"Black"    ),      # 14
 )
 
@@ -73,13 +84,11 @@ class PopupColorSelector(wx.PopupTransientWindow):
         wx.PopupTransientWindow.__init__(self, parent, wx.NO_BORDER)
         self.parent = parent
 
-        self.color_num = len(ColorTable)
-
         self.SetBackgroundColour(wx.Colour(255, 255, 255))
         bSizer1 = wx.BoxSizer(wx.VERTICAL)
-        gSizer1 = wx.GridSizer(0, 5, 0, 0)
+        gSizer1 = wx.GridSizer(COLOR_PAD_ROW_NUM, COLOR_PAD_COL_NUM, 0, 0)
 
-        for i in range(self.color_num):
+        for i in range(15):
             exec("self.m_staticText%d = wx.StaticText(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(24, 24), 0)" % i)
             exec("self.m_staticText%d.Wrap(-1)" % i)
             exec("self.m_staticText%d.SetBackgroundColour(ColorTable[%d][0])" % (i, i))
@@ -102,7 +111,7 @@ class PopupColorSelector(wx.PopupTransientWindow):
         self.m_btnCustom.Bind(wx.EVT_BUTTON, self.OnBtnCustom)
         self.Bind(wx.EVT_PAINT, self.OnPaint_Window)
 
-        for i in range(self.color_num):
+        for i in range(15):
             eval("self.m_staticText%d.Bind(wx.EVT_PAINT, lambda evt, self = self: self.OnPaint_StaticText(evt, %d))" % (i, i))
             eval("self.m_staticText%d.Bind(wx.EVT_LEFT_UP, lambda evt, self = self: self.OnLeftUp_StaticText(evt, %d))" % (i, i))
             eval("self.m_staticText%d.Bind(wx.EVT_ENTER_WINDOW, lambda evt, self = self: self.OnEnterWindow(evt, %d))" % (i, i))
@@ -129,10 +138,14 @@ class PopupColorSelector(wx.PopupTransientWindow):
         if self.focus is idx:
             # Draw the inner border of focused color
             dc.SetPen(wx.Pen(wx.Colour(255, 226, 148)))
-            dc.SetBrush(wx.Brush(wx.Colour(255, 255, 255), wx.BRUSHSTYLE_TRANSPARENT))
-            rect = eval("self.m_staticText%d.GetClientRect()" % idx)
-            dc.DrawRectangle(*rect)
-
+            dc.SetBrush(wx.Brush(ColorTable[idx][0], wx.SOLID))
+        else:
+            dc.SetPen(wx.TRANSPARENT_PEN)
+            dc.SetBrush(wx.Brush(ColorTable[idx][0], wx.SOLID))
+        
+        rect = eval("self.m_staticText%d.GetClientRect()" % idx)
+        dc.DrawRectangle(*rect)
+        
         evt.Skip()
 
     def OnPaint_Window(self, evt = None):
@@ -141,11 +154,11 @@ class PopupColorSelector(wx.PopupTransientWindow):
 
         # Draw the border of PopupWindow
         dc.SetPen(wx.Pen(wx.Colour(134, 134, 134)))
-        dc.SetBrush(wx.Brush(wx.Colour(255, 255, 255), wx.BRUSHSTYLE_TRANSPARENT))
+        dc.SetBrush(wx.TRANSPARENT_BRUSH)
         rect = self.GetClientRect()
         dc.DrawRectangle(*rect)
 
-        for i in range(self.color_num):
+        for i in range(15):
             if self.focus is i:
                 dc.SetPen(wx.Pen(wx.Colour(242, 148, 54)))      # Draw the border of focused color
             else:

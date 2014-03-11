@@ -241,13 +241,6 @@ class MyApp(wx.App):
 
         return True
 
-    def OnMouseWheel(self, evt):
-        if evt.WheelRotation > 0:
-            self.Zoom(self.zoomFactor * 1.25)
-        else:
-            self.Zoom(self.zoomFactor * 0.8)
-        
-
     def OnEnterMeasure_T(self, evt, idx):
         ctrl = evt.GetEventObject()
         font = ctrl.GetFont()
@@ -541,7 +534,7 @@ class MyApp(wx.App):
         if self.movingT is not None:
             self.DrawMeasureLine(dc, self.movingT_x, self.movingT)
 
-        print "Paint: %s" % (time.time() - start)
+        #print "Paint: %s" % (time.time() - start)
         
         
     def DrawGrid(self, dc):
@@ -568,6 +561,12 @@ class MyApp(wx.App):
         dc.DrawText('%d' % (id + 1), x - 3, -1)
         dc.DrawLine(x, MEASURE_LINE_TOP, x, MEASURE_LINE_BTM)
         dc.DrawText('%d' % (id + 1), x - 3, MEASURE_LINE_BTM - 2)
+
+    def OnMouseWheel(self, evt):
+        if evt.WheelRotation > 0:
+            self.Zoom(self.zoomFactor * 1.25)
+        else:
+            self.Zoom(self.zoomFactor * 0.8)
 
     def OnZoom1(self, evt):
         self.Zoom( 5.0 )
@@ -605,10 +604,21 @@ class MyApp(wx.App):
     def Zoom(self, factor):
         self.arrow = None
         self.zoomFactor = factor
-        self.statusbar.SetStatusText('%.2f%%' % (factor * 100), 3)
+        oldx, oldy = self.frame.wdCanvas.GetViewStart()
+        oldwidth = self.waveform[0]
         if 0 < len(self.waveform):
+            
             self.ZoomWaveform()
-
+            newwidth = self.waveform[0]
+            if oldwidth is not 0:
+                newx = (newwidth / oldwidth) * oldx
+            else:
+                newx = oldx
+            
+            self.frame.wdCanvas.Scroll(newx, oldy)
+            
+        self.statusbar.SetStatusText('%.2f%%' % (factor * 100), 3)
+        
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)
         evt.Skip()
@@ -691,7 +701,7 @@ class MyApp(wx.App):
         self.frame.pnlCanvas.SetSize(self.canvasFullSize)
         self.frame.pnlCanvas.SetMinSize(self.canvasFullSize)
         self.frame.wdCanvas.SetScrollbar(wx.HORIZONTAL | wx.VERTICAL, 1, 1, 10)
-        self.frame.pnlCanvas.Refresh(eraseBackground = False)
+        #self.frame.pnlCanvas.Refresh(eraseBackground = False)
 
     def OnAbout(self, evt = None):
         # First we create and fill the info object

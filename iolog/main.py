@@ -604,10 +604,19 @@ class MyApp(wx.App):
     def Zoom(self, factor):
         self.arrow = None
         self.zoomFactor = factor
-        oldx, oldy = self.frame.wdCanvas.GetViewStart()
-        oldwidth = self.waveform[0]
+        
         if 0 < len(self.waveform):
+            oldx, oldy = self.frame.wdCanvas.GetViewStart()
+            oldwidth = self.waveform[0]
+            try:
+                rect = self.frame.wdCanvas.GetRect()
+            except wx.PyDeadObjectError:
+                wUnits = 0
+            else:
+                wUnits = rect.GetWidth() / 10
             
+            oldx += wUnits / 2
+            self.frame.wdCanvas.Freeze()
             self.ZoomWaveform()
             newwidth = self.waveform[0]
             if oldwidth is not 0:
@@ -615,9 +624,13 @@ class MyApp(wx.App):
             else:
                 newx = oldx
             
+            newx -= wUnits / 2
+            
             self.frame.wdCanvas.Scroll(newx, oldy)
+            self.frame.wdCanvas.Thaw()
             
         self.statusbar.SetStatusText('%.2f%%' % (factor * 100), 3)
+        
         
     def OnTitleScroll(self, evt = None):
         wx.CallAfter(self.OnTitleScrolled)

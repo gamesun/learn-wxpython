@@ -611,11 +611,15 @@ class MyApp(wx.App):
             try:
                 rect = self.frame.wdCanvas.GetRect()
             except wx.PyDeadObjectError:
-                wUnits = 0
+                mouseX = 0
             else:
-                wUnits = rect.GetWidth() / 10
+                pos = self.frame.ScreenToClient(wx.GetMousePosition())
+                if rect.Contains(pos):
+                    mouseX = pos.x / 10
+                else:
+                    mouseX = (rect.GetWidth() / 10) / 2
             
-            oldx += wUnits / 2
+            oldx += mouseX
             self.frame.wdCanvas.Freeze()
             self.ZoomWaveform()
             newwidth = self.waveform[0]
@@ -624,7 +628,7 @@ class MyApp(wx.App):
             else:
                 newx = oldx
             
-            newx -= wUnits / 2
+            newx -= mouseX
             
             self.frame.wdCanvas.Scroll(newx, oldy)
             self.frame.wdCanvas.Thaw()

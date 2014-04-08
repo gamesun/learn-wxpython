@@ -760,8 +760,13 @@ def Parser(lines):
     """
 
     RawData = [g_match.search(l) for l in lines]                                    # get the origin data
-    list = [(r.group('time'), r.group('value')) for r in RawData if r is not None]  # filter the null data
-    list.sort()
+    list = [[r.group('time'), r.group('value')] for r in RawData if r is not None]  # filter out the null data
+    #list.sort()
+    for i in range(len(list) - 1):
+        if int(list[i][0], 16) >= int(list[i + 1][0], 16):
+            for j in range(i + 1, len(list)):
+                list[j][0] = hex(int(list[j][0], 16) + 0xffff).split('x')[1]
+
 
     if 0 < len(list):
 #        matrix = [[(int(l[0], 16), int(v)) for v in bits(int(l[1], 16), 32)] for l in list]

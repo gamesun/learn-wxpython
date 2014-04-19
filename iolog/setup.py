@@ -89,7 +89,7 @@ language="*"
 </assembly>
 '''
 
-CONTENT_DIRS = []
+CONTENT_DIRS = [ "media" ]
 EXTRA_FILES = []
 
 class MediaCollector(build_exe):

@@ -42,6 +42,10 @@ import codecs
 import ConfigParser
 import PopupColorSelector as pcs
 import time
+import icon32, icon16
+import pkg_resources
+import zipfile
+from cStringIO import StringIO
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -69,6 +73,18 @@ class MyApp(wx.App):
     def OnInit(self):
         self.frame = layout.myFrame(None)
 
+        if sys.platform == 'win32':
+            my_data = pkg_resources.resource_string(__name__,"library.zip")
+            filezip = StringIO(my_data)
+            zf = zipfile.ZipFile(filezip)
+            data = zf.read("media/icon16.ico")
+            icon = wx.EmptyIcon()
+            icon.CopyFromBitmap(wx.ImageFromStream(StringIO(data), wx.BITMAP_TYPE_ICO).ConvertToBitmap())
+            self.frame.SetIcon(icon)                        # for the app's title of main window
+            self.frame.SetIcon(icon32.geticon32Icon())      # for the app's task bar
+        elif sys.platform.startswith('linux'):
+            self.frame.SetIcon(icon32.geticon32Icon())
+            
         self.frame.wdTitle.SetScrollRate(10, WF_H_OFFSET / 2)
         self.frame.wdCanvas.SetScrollRate(10, WF_H_OFFSET / 2)
 
@@ -738,7 +754,7 @@ class MyApp(wx.App):
         info.Developers = [ appInfo.author ]
         info.License = wordwrap(appInfo.copyright, 500, wx.ClientDC(self.frame))
 
-#        info.Icon = icon32.geticon32Icon()
+        info.Icon = icon32.geticon32Icon()
 
         wx.AboutBox(info)
 

@@ -43,8 +43,8 @@ import ConfigParser
 import PopupColorSelector as pcs
 import time
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 # waveform parameters
 WF_LEFT_MARGIN = 5
